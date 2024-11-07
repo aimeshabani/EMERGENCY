@@ -58,7 +58,7 @@ import pathlib
 from plyer import notification
 import asyncio
 from kivy.properties import BooleanProperty
-
+from kivy.uix.widget import Widget
 
 
 if platform == 'android':
@@ -235,10 +235,6 @@ def underground(x="0"):   #     0 : start service        1 : close & open App   
             print(">>>>>>>", mActivity, "<<<<<<<<<<<<<<<<<<<")
             argument = ''
             service.start(mActivity, argument)
-
-
-
-
 
 class CameraPreview(Widget):
     def __init__(self, **kwargs):
@@ -460,163 +456,9 @@ def S_TextInputApp(Text="",BG=(0, 0, 0, 1) , FG=(1, 1, 1, .6)):
     return main_layout
 
 class ExText(TextInput):
-    def __int__(self,**kwargs):
+    def __init__(self,**kwargs):
         super(ExText,self).__init__(**kwargs)
         self.bind(minimum_height=self.setter('height'))
-
-class BS(Screen):
-    def __init__(self,**kwargs):
-        super(BS,self).__init__(**kwargs)
-        self.ME=json.load(open("SD/conf/me.json", "r"))
-        # if PASS == "0":
-        #     return
-
-        self.SLD = []
-        self.HIDE = -.2
-
-        self.Desktop = RelativeLayout(size_hint=(1., 1.))
-        # self.Desktop.add_widget(AsyncImage(source="WALL/lion.jpg"))
-
-        self.SSR=RelativeLayout(size_hint=(.3, .05),pos_hint={'center_x': .67, 'center_y': .88})
-
-        self.seach = TextInput(hint_text="Search in ", foreground_color=(0,0,0, 1),pos_hint={'center_x': .5, 'center_y': .95},
-                               background_color=(1, 1, 1, .8),multiline=False, allow_copy=True, size_hint=(None, None),size=(Window.width/4, Window.height / 18))
-        self.seach.bind(on_text_validate=self._search_client)
-        self.seach.bind(focus=self.resiz)
-
-        self.btn=Button(background_color=(1, .1, 1, 0),size_hint=(1,1),pos_hint={'center_x': .5, 'center_y': .5})
-        self.SSR.add_widget(self.btn)
-        self.SSR.add_widget(self.seach)
-        self.Desktop.add_widget(self.SSR)
-
-        self.add_widget(self.Desktop)
-
-
-        print("#  KEEP DELETING EXPIRED VARIABLES FOR FAST MEMORY")
-
-    def _search_client(self,w,t=None):
-        print("Searching....")
-        if len(w.text)< 2:
-            w.text=""
-            w.hint_text="2 digits above please"
-            return
-
-        if "f" in locals() :
-            if w.text== f :
-                print('returned')
-                return
-
-        self.SCV = ScrollView(size_hint=(.97, .9), pos_hint={'center_x': .5, 'center_y': .45},
-                              do_scroll_x=False,
-                              do_scroll_y=True, scroll_type=['bars', 'content'], bar_width=10,
-                              bar_color=(1, 1, 0, 1),
-                              bar_margin=0)
-
-        self.GG = GridLayout(cols=3, size_hint=(1, None), size=(1, Window.size[1] / 12),
-                             pos_hint={'center_x': .5, 'center_y': .57})
-
-        try:
-            self.SSR.clear_widgets()
-        except:
-            pass
-
-        try:
-            self.SSR.add_widget(self.btn)
-            self.SSR.add_widget(self.seach)
-        except:
-            pass
-        self.SCV.add_widget(self.GG)
-        # GTC.add_widget(self.SCV)
-        self.SSR.add_widget(self.SCV)
-
-        threading.Thread(target=self.dinamo).start()
-        f=w.text
-        d = {"action": "find", "kw": w.text, "idd": self.ME["idd"], "sender": self.ME["idd"],"recipients": [self.ME["idd"]]}
-        send(d)
-
-    def dinamo(self,stop=None):
-
-        while True:
-            # print("Dinamo")
-            if os.path.isfile("BREAK") :
-                print("BREAK1")
-                break
-            # from BACK import RRR
-            try:
-                if len(RRR) >0 :
-                    Clock.schedule_once(self._layers)
-            except Exception as e:
-                print(f"The error in dinamo  is : {e}")
-        try:
-            os.remove("BREAK")
-            print("BREAK2")
-        except:
-            pass
-
-    def _layers(self,s):
-        print("Found...")
-        "CHANGE HERE TO FETCH ONLY IDD AND NAMES FROM SERVER,  NOT ALL DATAS   "
-        try:
-            print("in _layer try")
-            if RRR[-1] == "stop" :
-                RRR.remove(RRR[-1])
-            s=RRR[-1]
-            RRR.remove(RRR[-1])
-        except Exception as e:
-            print("From _layer: returned !  cause:  ",e)
-            return
-
-
-
-        port = 2121
-        IP = "127.0.0.1"
-        srv = "aime shabani"
-        pwd = "12435687"
-        FTP = "C_IMG/"  # "root/SERVER/C_IMG/"
-
-        # GTC=GridLayout(cols=1, size_hint=(1, .9), size=(1, Window.size[1] / 12),
-        #                      pos_hint={'center_x': .5, 'center_y': .475})
-
-
-        # "data": {"acc":x,"idd":dic["idd"],"keyw":i+"@"+dic[i]+"$"+M["kw"]}
-
-        tx = s["keyw"][:s["keyw"].index("@")] + ": " + s["keyw"][s["keyw"].index("@") + 1:s["keyw"].index("$")].upper().replace(s["keyw"][s["keyw"].index("$") + 1:].upper(), s["keyw"][s["keyw"].index("$") + 1:].lower())
-        web = 'ftp://' + srv + ':' + pwd + '@' + IP + ":" + str(port) + '/' + FTP + s["acc"]+".png"
-        rl = RelativeLayout(size_hint=(None,None),size=(Window.size[1]/4.5,Window.size[1]/3))
-        rl.add_widget(AsyncImage(source=web,size_hint=(1,1),pos_hint={"center_x": .5,"center_y": .5}))      #   IMAGE  ,   NAME   , TRANSPARENT BUTTON
-        rl.add_widget(TextInput(size_hint=(.87, .250),text=tx  , background_color=(0,0,0,.5),foreground_color=(1,1,1,.5) ,pos_hint={"center_x": .5, "center_y": .2} )    )
-        rl.add_widget(Button( background_color=(0,0,0,0),ids={"idd":s,"photo":web},size_hint=(1,.77),pos_hint={"center_x": .5,"center_y": .5},on_release=self.one_guy1))
-        self.GG.add_widget(rl)
-        if len(self.GG.children) % self.GG.cols == 0:
-            self.GG.size[1] += Window.size[1]/12
-
-        if len(RRR) >1 :
-            Clock.schedule_once(self._layers)
-            print("deleted ", RRR[-1])
-            # RRR.remove(RRR[0])
-
-
-        elif len(RRR) == 1:
-            Clock.schedule_once(self._layers)
-
-        else:
-            threading.Thread(target=self.dinamo).start()
-
-    def resiz(self,w,t=None):
-        self.seach.unbind(focus=self.resiz)
-        self.xx = 0.05
-
-        self.SSR.pos_hint={'center_x': .67, 'center_y': .5}
-        self.btn.background_color=(1, 1, 1, .75)
-        Clock.schedule_interval(self.big,0)
-
-    def big(self,x):
-        if self.xx >= 0.87:
-            Clock.unschedule(self.big)
-        else:
-            self.SSR.size_hint = (.3, self.xx)
-            self.xx += 0.08
-
 
 class RM(Screen):
     def __init__(self,**kwargs):
@@ -671,7 +513,8 @@ class RM(Screen):
             """ USE GPS IN GUI TO FIND COUNTRY AND CITY .   THATS IS THE BEST.      I MAY FIND KYAKA II ALSO"""
             IDD=str(uuid.uuid4())
 
-            dic={"Name": ["Emergency", "x"+str(randint(0,100000))], "pseudo": "Unknown", "busy": "Job/Trading", "adress": ["World", "Everywhere"], "idd": IDD,"perm":[IDD[:8]],"LIKE":[0,1]}
+            dic={"Name": ["Emergency", "x"+str(randint(0,100000))], "pseudo": "Unknown", "busy": "Job/Trading", "adress": ["World", "Unclassified"],
+                 "idd": IDD,"perm":[IDD[:8]],"LIKE":[0,1],"lk":11}
             self.ME=dic
             self.JOBTALENT=IDD[:8]
             self.PAIDADDS=IDD[:16]
@@ -685,8 +528,6 @@ class RM(Screen):
 
         else:
             if json.load(open("SD/conf/me.json", "r"))["adress"][0] == "World" :
-                Clock.schedule_once(self.new, 0)
-            else:
                 self.ME = json.load(open("SD/conf/me.json", "r"))
                 self.JOBTALENT = self.ME["idd"][:8]
                 self.PAIDADDS = self.ME["idd"][:16]
@@ -694,6 +535,14 @@ class RM(Screen):
                 underground(x="0")
                 Clock.schedule_once(self.BS, 1)
                 # Clock.schedule_once(self.home)
+                Clock.schedule_once(self.new, 20)
+            else:
+                self.ME = json.load(open("SD/conf/me.json", "r"))
+                self.JOBTALENT = self.ME["idd"][:8]
+                self.PAIDADDS = self.ME["idd"][:16]
+                self.ORG = self.ME["idd"][:24]
+                underground(x="0")
+                Clock.schedule_once(self.BS, 1)
 
     def down(self,touch,what):
         Window.bind(on_touch_up=lambda touch,what: Clock.unschedule(self.IP))
@@ -762,7 +611,7 @@ class RM(Screen):
         if "#...*#" in w.text:
             # d = json.load(open("SD/conf/me.json", "r"))
             # w.text=d["idd"]
-
+            w.background_color=(0,1,0,1)
             d = json.load(open("SD/conf/me.json", "r"))
             if not d["idd"][:8] in d["perm"]:
                 d["perm"].append(d["idd"][:8])
@@ -804,7 +653,7 @@ class RM(Screen):
                 ID = str(uuid.uuid4()).replace("-", "").replace(" ", "").replace("_", "").replace(":", "").replace("/",
                                                                                                                    "").lower() + "ONE"
                 me = {"Name": [r_n.text, r_pn.text], "pseudo": PS.text, "busy": ad3.text,
-                      "adress": [ad1.text, ad2.text], "idd": ID, "perm": [ID[:8]], "LIKE": [0, 1]}
+                      "adress": [ad1.text, ad2.text], "idd": ID, "perm": [ID[:8]], "LIKE": [0, 1],"lk":21}
                 self.ME = me
                 self.JOBTALENT = ID[:8]
                 self.PAIDADDS = ID[:16]
@@ -826,9 +675,10 @@ class RM(Screen):
                 del ok
                 self.ME = json.load(open("SD/conf/me.json", "r"))
 
-                # Clock.schedule_once(self.home, 1)
-                to_back("conf/me.json",
-                        me)  # all is okay, but put this in tempo folder like SD and put put in emulated whenever
+                try:
+                    to_back("conf/me.json",me)
+                except:
+                    pass
                 sen = {"action": "N_user", "data": me, "sidd": str(uuid.uuid4())[:5]}
                 send(sen)
                 self.clear_widgets()
@@ -841,6 +691,7 @@ class RM(Screen):
         """
         pseudo,idd,url_ch,port,real_names, unkown name,
         """
+        olD=json.load(open("SD/conf/me.json", "r") )
         dd = open("SD/countries.json", "r")
         PAYS = json.load(dd)
         g_new = GridLayout(cols=1, spacing=Window.size[0] / 180)  ##  ,col_default_width=Window.width/1.5,col_force_default=True,row_default_height=Window.height/9,row_force_default=True
@@ -854,7 +705,14 @@ class RM(Screen):
         ad1 = Spinner(text="choose country", values=tuple(PAYS.keys()))
         ad2 = Spinner(text="choose city")
         ad1.bind(text=city)
-        ad3 = Spinner(text="Job/Trading", values=("Job","Trading"))
+        ad3 = Spinner(text="Job/Trading", values=("Job","Trading","Leader","Talent","Org"))
+        if len(olD) > 4 :
+            PS.text=olD["pseudo"]
+            r_n.text=olD["Name"][0]
+            r_pn.text = olD["Name"][1]
+            ad1.text = olD["adress"][0]
+            ad2.text = olD["adress"][1]
+            ad3.text = olD["busy"]
 
         g_new.add_widget(ad1)
         g_new.add_widget(ad2)
@@ -883,17 +741,17 @@ class RM(Screen):
         global wl
 
         Window.bind(on_keyboard=self.KEYS)
-        if "rideau2" in dir(self):
-            print("self.rideau2.source: ",self.rideau2.source)
-            wl=self.rideau2.source
-        else:
-            lt = os.listdir("Temp/")
-            wl = "Temp/" + lt[randint(0, len(lt) - 1)]
+        # if "rideau2" in dir(self):
+        #     print("self.rideau2.source: ",self.rideau2.source)
+        #     wl=self.rideau2.source
+        # else:
+        #     lt = os.listdir("Temp/")
+        #     wl = "Temp/" + lt[randint(0, len(lt) - 1)]
 
-        self.Desktop = RelativeLayout(size_hint=(1., 1.))
+        self.Desktop = RelativeLayout(size_hint=(None,None),size=(Window.width/1.5,Window.height/2))
         with self.Desktop.canvas.before:
-            Color(1, 1, 1, .7)
-            self.rideau2 = Rectangle(source=wl, pos=(0, 0), size=(Window.width, Window.height))
+            Color(0,0,0,1)
+            self.rideau2 = Rectangle( pos=(0, 0), size=(Window.width, Window.height))
 
         self.keys=Label(text="IDD MPAKA 20")
 
@@ -903,7 +761,7 @@ class RM(Screen):
 
         familly=os.listdir("REMINDERS/")
 
-        self.damain=GridLayout(row_default_height=Window.size[1]/11,
+        self.damain=GridLayout(row_default_height=Window.size[1]/11,pos_hint={"center_x":.01,"center_y":.89},
                                   row_force_default=True,cols=1,size_hint=(1,None),size=(1,((Window.size[1]/100)* 20)* len(familly)) )
 
         self.damain.add_widget(Button(text="...",bold=True,font_size=40,on_release=self.New,background_normal="data/icos/bb.png",background_color=(.65,0,.2,.8)))
@@ -923,7 +781,8 @@ class RM(Screen):
         self.scrol_domain.add_widget(self.damain)
         self.Desktop.add_widget(self.scrol_domain)
 
-        self.add_widget(self.Desktop)
+        # self.add_widget(self.Desktop)
+        self.moveer(self.Desktop,pos=(50,50))
 
         if platform == "android":
             print("oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo")
@@ -1800,7 +1659,6 @@ class RM(Screen):
             else:
                 self.WIDG.pos=(self.WIDG.pos[0]-4,self.WIDG.pos[1])
 
-
     def _slid_new_acc2(self,x):
         if self.insid2 < self.stp2 :
             Clock.unschedule(self._slid_new_acc2)
@@ -1854,7 +1712,6 @@ class RM(Screen):
             else:
                 self.WIDG.pos_hint={"center_x":self.insid}
                 self.insid+=0.03
-
 
     def auto_scroll(self, wid, xy, speed):
         global star_scl_plus, star_scl_minus
@@ -1988,7 +1845,7 @@ class RM(Screen):
     def BS(self,x):
 
         Window.bind(on_keyboard=self.KEYS)
-        #################################################
+        #################################
         if "rideau2" in dir(self):
             print("self.rideau2.source: ", self.rideau2.source)
             wl = self.rideau2.source
@@ -2012,24 +1869,494 @@ class RM(Screen):
 
         for directory in ["org", "JobTalent", "paidAdds", self.ME["adress"][1]]:
             if not os.path.isdir(dr()+"Activities/"+directory):
-                os.mkdir(dr()+"Activities/"+directory)
+                os.makedirs(dr()+"Activities/"+directory)
 
 
         self.DIST=(Window.size[1] /6)
         Clock.schedule_once(lambda cc: threading.Thread(target=self.org).start(), 1)
         Clock.schedule_once(lambda cc: threading.Thread(target=self.MME).start(), 1)
-        self.SS()
+
         self.OPTIONS()
         if not self.ME.get("jb",0) or len(self.ME.get("jb",[])) == 0:
-
-
             Clock.schedule_once(lambda cl: self.WORK(cl,msg="You have not selected any job! \nYou can choose up to 5:\n"),20)
+
         if platform != "android" :
             from SERVICE import start as ST
             threading.Thread(target=ST, args=(1,)).start()
         THR=threading.Thread(target= self.RECEIVER,args=(4,))
         THR.start()
-        server.bind(b'/RECEIVER', self.RECEIVER)
+        Clock.schedule_once(self.SIDEBAR,4)
+        Clock.schedule_once(self.LOCAL_JOB, 4)
+        # THR = threading.Thread(target=self.LOCAL_JOB, args=(4,))
+        # THR.start()
+        try:
+            server.bind(b'/RECEIVER', self.RECEIVER)
+        except:
+            pass
+
+    def SIDEBAR(self,clo):
+        def disp(cl):
+            nonlocal clock
+            clock = Clock.schedule_interval(DIS, 1 / 100)
+
+        def DIS(cl):
+            nonlocal SB, clock
+            if SB.opacity <=0 :
+                Clock.unschedule(clock)
+                self.remove_widget(SB)
+            else:
+                SB.opacity=SB.opacity-0.03
+
+        def APEAR(cl):
+            nonlocal SB, clock
+
+            if SB.opacity >= 0.95:
+                Clock.unschedule(clock)
+                Clock.schedule_once(disp,8)
+            else:
+                SB.opacity = SB.opacity + 0.03
+
+        SB=Widget(opacity=0,pos=(0,0),size_hint=(.08,1))  #          pos_hint={"center_x":.01,"center_y":.7}
+        GR=GridLayout(cols=1,size_hint=(None,1),pos_hint={"center_x":.0,"center_y":.0},spacing=10,size=((Window.width/100)*8,Window.size[1]))
+        with GR.canvas.before:
+            Color(randint(2,100)/100,randint(2,100)/100,randint(2,100)/100, randint(50,101)/100)
+            RoundedRectangle(pos=SB.pos,radius=[10],size=((Window.width/100)*12,Window.size[1]))
+
+        me =MDIconButton(md_bg_color=(0,0,0,0),icon_size=(Window.width/100)*8,
+                         ids={"idd":self.ME["idd"],"schm":dr()+"contacts/"+self.ME["idd"]},on_release=self.PROFILE)
+
+        if os.path.isfile(dr()+"contacts/"+self.ME["idd"]+"/"+self.ME["idd"]+".png"):
+            if os.path.getsize(dr()+"contacts/"+self.ME["idd"]+"/"+self.ME["idd"]+".png") > 2000 :
+                me.icon=dr()+"contacts/"+self.ME["idd"]+"/"+self.ME["idd"]+".png"
+            else:
+                me.icon = "photos/user.png"
+        else:
+            me.icon="photos/user.png"
+        work=MDIconButton(md_bg_color=(0,0,0,0),icon="photos/pay2.png",icon_size=(Window.width/100)*8,on_release=self.WORK) #pay2, r.png
+
+        remi = MDIconButton(md_bg_color=(0, 0, 0, 0), icon="photos/remi.png", icon_size=(Window.width / 100) * 8,
+                          ids={"idd": self.ME["idd"], "schm": dr() + "contacts/" + self.ME["idd"]},
+                          on_release=self.home)
+
+        GR.add_widget(me)
+        GR.add_widget(work)
+        GR.add_widget(remi)
+
+        contacts=self._files(dr()+"contacts/")
+
+        con=Label(text="Contacts: "+str(len(contacts)-1),underline=True,size_hint=(None,None),size=((Window.width/100)*12,(Window.width/100)*3))
+        con.font_size=con.font_size-6
+        GR.add_widget(con)
+
+        print("THE CONTACTS BELOW SHOULD BE IN      SCROLLVIEW       IN NEXT UPDATE.")
+        mov=ScrollView(size_hint=(1,.5), do_scroll_x=False, do_scroll_y=True, scroll_timeout=200, scroll_distance=40,
+                          scroll_type=['bars', 'content'], bar_width=1, bar_color=(1, 0, 0, 1), bar_margin=0
+                              ,pos_hint={"center_x": .5, "center_y": .3})
+        Gmov=GridLayout(cols=1,size_hint=(1,None),spacing=5,size=(3, ((Window.width / 100) * 16) *len(contacts) +450  ))
+
+        for z in contacts:
+            print("contact ",z)
+            if z != self.ME["idd"]:
+                cnct=MDIconButton(md_bg_color=(0,0,0,0),icon_size=(Window.width/100)*8,
+                                  ids={"idd":z,"schm":dr()+"contacts/"+z},on_release=self.PROFILE)
+                if os.path.isfile(dr()+"contacts/"+z+"/"+z+".png"):
+                    cnct.icon=dr()+"contacts/"+z+"/"+z+".png"
+                else:
+                    cnct.icon="photos/user.png"
+                Gmov.add_widget(cnct)
+
+        mov.add_widget(Gmov)
+        GR.add_widget(mov)
+        SB.add_widget(GR)
+        self.add_widget(SB)
+
+        clock=Clock.schedule_interval(APEAR,1/100)
+
+    def DOWNN(self, x, y):
+        """  GOING UP   """
+        def down(x):
+            x = randint(0, Window.size[0] // 1.4)
+            y = randint(0, Window.size[1] // 1.5)
+            self.CLOCK=Clock.schedule_interval(lambda Clo: self.UPP(x, y), 1 / 1000)
+        if self.Skat.pos[0] >= x or self.Skat.pos[1] >= y:
+            # print(self.Skat.pos[0])
+            Clock.unschedule(self.CLOCK)
+
+            Clock.schedule_once(down, 10)
+        else:
+            self.Skat.pos = (self.Skat.pos[0] + 8, self.Skat.pos[1] + 8)
+
+    def UPP(self, x, y):
+        """  GOING DOWN  """
+        def upp(x):
+            try:
+                posit=eval(open("offposition","r").read())
+                x=posit[0]
+                y=posit[1]
+            except:
+                x = Window.size[0] - 80
+                y = Window.size[1] - 60
+
+            try:
+                Clock.unschedule(self.CLOCK)
+            except:
+                pass
+            self.CLOCK=Clock.schedule_interval(lambda Clo: self.DOWNN( x, y), 1 / 1000)
+
+        if self.Skat.pos[0] < x and self.Skat.pos[1] < y:
+            if self.Skat.pos[0] < 0 :
+                self.Skat.pos=(0,self.Skat.pos[1] )
+            if self.Skat.pos[0] < 0 :
+                self.Skat.pos=(0,self.Skat.pos[1] )
+            # print(self.Skat.pos)
+            Clock.unschedule(self.CLOCK)
+
+            Clock.schedule_once(upp, 10)
+        else:
+            self.Skat.pos = (self.Skat.pos[0] - 8, self.Skat.pos[1] - 8)
+
+    def DISAP(self,widg,pos=(Window.size[0]/3,Window.size[1]/4)):
+        def save_pos(widg,touch):
+            open("offposition", "w").write(str(widg.pos))
+            # try:
+            #     pos = eval(open("offposition", "r").read())
+            # except:
+            #     pos=(Window.size[0] - 80,Window.size[1] - 60)
+            #
+            # if widg.pos==pos:
+            #     pass
+            # else:
+            #     open("offposition", "w").write(str(widg.pos))
+            # print(widg.pos)
+        def clocK(x):
+            try:
+                posit = eval(open("offposition", "r").read())
+                x = posit[0]
+                y = posit[1]
+            except:
+                x = Window.size[0] - 80
+                y = Window.size[1] - 60
+            try:
+                Clock.unschedule(self.CLOCK)
+            except:
+                pass
+            self.CLOCK=Clock.schedule_interval(lambda clo: self.UPP( x, y), 1 / 1000)
+
+        try:
+            pos = eval(open("offposition", "r").read())
+        except:
+            pos=(Window.size[0] - 80,Window.size[1] - 60)
+        self.Skat = Scatter(size_hint=(None, None),ids={"x":pos[0]},pos=pos)
+        with self.Skat.canvas.before:
+            Color(0,0,1,1)
+            rect=RoundedRectangle(pos=(0,0),radius=[10],size=(Window.size[0]/20,Window.size[0] /30))
+
+        self.Skat.add_widget(widg)
+
+        # skat.size=(Window.width, Window.size[1] / 6)
+        self.Skat.size =(widg.size[0]+70,widg.size[1])
+        widg.pos=(self.Skat.size[0]/20,0)
+
+        self.call_slid(wid=self.Skat)
+        self.SLD.append([self.Skat, self])
+        self.add_widget(self.Skat)
+        self.Skat.bind(on_touch_up=self.TOUCH)
+        self.Skat.bind(on_touch_up=save_pos)
+        Window.bind(on_keyboard=self.KEYS)
+
+        try:
+            Clock.unschedule(self.CLOCK)
+            Clock.unschedule(clocK)
+        except:
+            pass
+        Clock.schedule_once(clocK, 1)
+
+    def interested(self,btn,TP,TC):
+        "  Send message to poster, then reserve changes to clients, on click, opens a popup with list of takers a their prices"
+        try:
+            sidd=btn.ids["sidd"]
+            idd=btn.ids["idd"]
+            ac = btn.ids["ac"]
+            price=TP[sidd]
+            comment=TC.get(sidd,"")
+            sidd2=str(uuid.uuid4()).replace("-", "").replace(" ", "").replace("_", "")[:5]
+            sent={"action":"GVM","a2":ac,"idd":self.ME["idd"],"sidd":sidd2,"jb":sidd,"prc":price,"recipients":[idd],"schm":"no","COMM":comment}
+            send(sent)
+        except:
+            pass
+
+    def given(self,sidd,choise):
+        if sidd in self._files(self.ME["adress"][1] + "/" + choise + "/given/") :
+            return (0,.8,0,1)
+        else:
+            return (0,0,0,1)
+
+    def Price(self,sidd,txt,OF_ND,wid):
+        prices=[]
+        pf=self._files(self.ME["adress"][1] + "/" + OF_ND + "/bagainers/"+sidd+"/")
+        for j in pf :
+            N=eval(open(self.ME["adress"][1] + "/" + OF_ND + "/bagainers/"+sidd+"/"+j , "r").read())
+            prices.append(  [int( N.get("prc","0") ) ,N.get("COMM","No comment") ]  )
+        if len(prices) :
+            wid.background_color=(.8,1,.8,.9)
+            prices.sort()
+            return prices[0]
+            # return str(max(prices) ) + "??"
+        else:
+            return [txt,"No comemnts"]
+
+    def CMNT(self,sidd,txt,OF_ND,wid):
+        prices=[]
+        pf=self._files(self.ME["adress"][1] + "/" + OF_ND + "/bagainers/"+sidd+"/")
+        for j in pf :
+            N=eval(open(self.ME["adress"][1] + "/" + OF_ND + "/bagainers/"+sidd+"/"+j , "r").read())
+            prices.append(  int( N.get("prc","0") )   )
+        if len(prices) :
+            wid.background_color=(.8,1,.8,.9)
+            return str(max(prices) ) + "??"
+        else:
+            return txt
+
+    def LOCAL_JOB(self,x,OF_ND="LOOKING FOR"):
+        """Need       OR     OFFER
+        START and STOP BUTTON
+        FROM LIST and CUSTOM INPUT
+        LAYOUT OF WHO ARE NEEDED IN EMERGENCY THIS TIME
+        LAYOUT OF WHOS OFFERING IN EMERGENCY THIS TIME
+        TIMEOUT ? 24HOURS ?
+
+        ONCE YOU START YOUR AVAILLABILITY, THATS WHEN YOU START INCREASINGING RESPONSE LIST LIKE SEARCH
+
+        REPLY WITH AMOUNT INT ONLY,    POSTER SEES AMOUNT AND HISTORY COLORS     THEN CLICKS ON ONE                           [poster_idd, in_geven,  in_hist,   sidd,   sidd_dir for int proposals,  text(20)  ]
+
+        GREEN: GIVEN       ORANGE:  NOT FIRST TIME
+        """
+        def GONE(LOC,PRC,OF_ND,comm,tmes,TS,DEL=None):
+            if not LOC :
+                return
+            if DEL :
+                sidd = str(uuid.uuid4())[:5].replace("_", "").replace("-", "")
+                d = {"schm": "ab", "action": OF_ND.replace(" ", "_"), "receiver": self.ME["jb"],
+                     "zone": self.ME["adress"], 'sidd': sidd, 'idd': self.ME["idd"],"delete":DEL.ids["sidd"]}
+                send(d)
+                return
+            if TS.text=="Mins" :
+                tm= 60* int(tmes.text)
+            if TS.text=="Hours" :
+                tm= 3600* int(tmes.text)
+            if TS.text=="Days" :
+                tm= 86400* int(tmes.text)
+            sidd=str(uuid.uuid4())[:5].replace("_","").replace("-","")
+            d={"schm":"ab","action":OF_ND.replace(" ","_"),"receiver":self.ME["jb"],"zone":self.ME["adress"],'sidd': sidd,
+               'pr': PRC.text, 'idd': self.ME["idd"], 'txt': LOC.text.replace("\n",""), 'tm': tm,"COMM":comm.text,}                         # real schm ?
+
+            send(d)
+            # open(self.ME["adress"][1]+"/"+OF_ND+"/"+sidd,"w").write(str(d))
+            self.LOCAL_JOB(x=5,OF_ND=OF_ND)
+
+        def tping(widg,tex):
+            nonlocal TP
+            TP[widg.ids["sidd"]]=widg.text
+            # print(TP)
+
+        def COMMENT(widg,tx):
+            nonlocal TC
+            TC[widg.ids["sidd"]] = widg.text
+
+        def txtime(sp,tx):
+            try:
+                int(tx)
+                pass
+            except:
+                sp.text = sp.text[:-1]
+
+        def focused(w,v):
+            Clock.unschedule(self.CLOCK)
+
+        def unfocused(w):
+            x = randint(0, Window.size[0] // 1.4)
+            y = randint(0, Window.size[1] // 1.5)
+            self.CLOCK=Clock.schedule_interval(lambda Clo: self.UPP(x, y), 1 / 1000)
+
+        if not os.path.exists(self.ME["adress"][1]+"/"+OF_ND):
+            os.makedirs(self.ME["adress"][1]+"/"+OF_ND)
+            os.makedirs(self.ME["adress"][1] + "/" + OF_ND+"/jobs")
+            os.makedirs(self.ME["adress"][1] + "/" + OF_ND + "/bagainers")
+            os.makedirs(self.ME["adress"][1] + "/" + OF_ND + "/given")
+        try:
+            self.remove_widget(self.OFF_NED.parent)
+            # self.OFF_NED.clear_widgets()
+        except:
+            pass
+        self.OFF_NED=RelativeLayout(size_hint=(None, None), size=(Window.size[0]/1.3, Window.height / 3.5))
+        with self.OFF_NED.canvas.before:
+            Color(randint(2,100)/100,randint(2,100)/100,randint(2,100)/100, randint(50,101)/100)
+            RCT = RoundedRectangle(pos=(0, 0), size=(Window.size[0]/1.3, Window.size[1] / 3.5))
+
+        HEADS=GridLayout(cols=2, size_hint=(None, None),spacing=self.OFF_NED.size[0]/6, size=(Window.size[0]/1.3, Window.size[1] / 20),pos_hint={"center_x":.5,"center_y":.85})
+
+        NEED=MDRaisedButton(text="I  AM LOOKING FOR: "+str(len(self._files(self.ME["adress"][1] + "/LOOKING FOR/jobs"))),size_hint=(None, None),_min_width=10,_min_height=2,
+                            md_bg_color=(randint(20,100)/100,randint(20,100)/100,randint(20,100)/100, 1) if "LOOKING" in OF_ND else (.2,.2,.2,.3),
+                            on_release=lambda btn:self.LOCAL_JOB(x=btn,OF_ND="LOOKING FOR"))
+
+        OFFER=MDRaisedButton(text="I AM OFFERING: "+str(len(self._files(self.ME["adress"][1] + "/OFFERING/jobs"))),size_hint=(None, None),_min_width=10,_min_height=2,
+                             md_bg_color=(randint(20,100)/100,randint(20,100)/100,randint(20,100)/100, 1) if "OFFERING" in OF_ND else (.2,.2,.2,.3),
+                             on_release=lambda btn:self.LOCAL_JOB(x=btn,OF_ND="OFFERING"))
+
+        NEED.font_size = NEED.font_size - 3
+        OFFER.font_size = OFFER.font_size - 3
+        HEADS.add_widget(NEED)
+        HEADS.add_widget(OFFER)
+
+        S_L_C_S  = ScrollView(size_hint=(1,.2), do_scroll_x=True, do_scroll_y=False, scroll_timeout=200, scroll_distance=40,
+                          scroll_type=['bars', 'content'], bar_width=1, bar_color=(1, 1, 0, 1), bar_margin=0
+                              ,pos_hint={"center_x": .5, "center_y": .13})  #  size=(self.OFF_NED.size[0], Window.size[1] / 20),
+
+        L_C_S = GridLayout(cols=7, size_hint=(None,1),size=(Window.size[0]*2, Window.size[1] / 10), pos=(0,0),row_default_height=Window.size[1] / 20,row_force_default=True)
+
+        LOC = TextInput(hint_text="I am " + OF_ND.lower() + " what ?",ids={"zn":[]} ,foreground_color=(0, 0, 0,  .8), multiline=False,background_color=(1, 1, 1,.8))
+        LOC.font_size=LOC.font_size-5
+        LOC.bind(focus=focused)
+        LOC.bind(on_text_validate=unfocused)
+
+        PRC = TextInput(hint_text="Price ? (Numbers only)", foreground_color=(0, 0, 0, .8),background_color=(1, 1, 1, .8),multiline=False)
+        PRC.font_size = PRC.font_size - 5
+        PRC.bind(text=txtime)
+        PRC.bind(focus=focused)
+        PRC.bind(on_text_validate=unfocused)
+
+        CHOOSE = MDRaisedButton(text="...", text_color=(1, 1, 1, 1), md_bg_color=(0, 0, 0, 1),on_release=lambda bt:self.WORK(bt,msg="Choose who receive : ",found=None,zn=LOC))
+
+        comm=TextInput(hint_text="Comment on it ", foreground_color=(0, 0, 0, .8),
+                        background_color=(1, 1, 1, .8),multiline=False)
+        comm.bind(focus=focused)
+        comm.bind(on_text_validate=unfocused)
+        comm.font_size = comm.font_size - 5
+
+        tmes = TextInput(hint_text="Time in numbers ", foreground_color=(0, 0, 0, .8),
+                         background_color=(1, 1, 1, .8),multiline=False)
+        tmes.font_size = tmes.font_size - 5
+        tmes.bind(text=txtime)
+        tmes.bind(focus=focused)
+        tmes.bind(on_text_validate=unfocused)
+
+        TS=Spinner(text="Days", values=tuple(["Days","Hours","Mins"]))
+        TS.font_size =  TS.font_size - 5
+
+        START = MDRaisedButton(text="START", text_color=(1, 1, 1, 1), md_bg_color=(0, 0, 0, 1))
+        START.font_size = START.font_size - 5
+        START.bind(on_release=lambda bt:GONE(LOC,PRC,OF_ND,comm,tmes,TS))
+        L_C_S.add_widget(LOC)
+        L_C_S.add_widget(CHOOSE)
+        L_C_S.add_widget(PRC)
+        L_C_S.add_widget(comm)
+        L_C_S.add_widget(tmes)
+        L_C_S.add_widget(TS)
+        L_C_S.add_widget(START)
+        S_L_C_S.add_widget(L_C_S)
+
+        scrowller=ScrollView(size_hint=(.98, .7), do_scroll_x=False, do_scroll_y=True, scroll_timeout=200, scroll_distance=40,
+                       scroll_type=['bars', 'content'], bar_width=50, bar_color=(.4, 0, 1, .6), bar_margin=0,
+                              pos_hint={"center_x": .5, "center_y": .45})
+
+
+        files = self._files(dir=self.ME["adress"][1] + "/" + OF_ND+"/jobs")
+        self.NEED = GridLayout(cols=1,spacing=7,padding=6, size_hint=(None, None), size=(Window.size[0]/1.5, (Window.size[1] / 20)*len(files)+140),row_default_height=Window.size[1] / 20,row_force_default=True,
+                               pos_hint={"center_x":.5,"center_y":.5})
+        _NEED = GridLayout(cols=4, spacing=7, padding=6, size_hint=(None, 1), size=(Window.size[0] *2,1 ),
+                               row_default_height=Window.size[1] / 20, row_force_default=True, pos_hint={"center_x": .5, "center_y": .5})
+        TP = {}
+        TC = {}
+
+        for n in files :
+            ones=ScrollView(size_hint=(1, 1), do_scroll_x=True, do_scroll_y=False, scroll_timeout=200, scroll_distance=40,
+                       scroll_type=['bars', 'content'], bar_width=1, bar_color=(1, 1, 0, 1), bar_margin=0,
+                       pos_hint={"center_x": .5, "center_y": .5})
+
+            grio=GridLayout(cols=6, spacing=7, padding=6, size_hint=(None, 1),
+                               size=(Window.size[0] *2,1 ),
+                               row_default_height=Window.size[1] / 20, row_force_default=True,
+                               pos_hint={"center_x": .5, "center_y": .5})
+
+            try:
+                N=eval(open(self.ME["adress"][1]+"/"+OF_ND+"/jobs/"+n , "r").read())
+            except:
+                N={}
+
+            btn=MDRaisedButton(text=N["txt"],text_color=(1, 1, 1, 1), md_bg_color=self.given(N["sidd"],OF_ND),size_hint=(None,None),size=(40,10),_min_height=2)
+            btn.font_size = btn.font_size - 5
+            # btn.bind(on_release=lambda z: self.interested(idd=N["idd"]))
+
+            btn2 = MDRaisedButton(text="24:00:00",text_color=(1, 1, 1, 1), md_bg_color=(0,0,0, 1),_min_height=2)
+            btn2.font_size = btn2.font_size - 5
+            counter = self.countdown
+            counter(btn2, self.ME["adress"][1] + "/" + OF_ND + "/jobs/" + n)
+
+            btn3 = MDRaisedButton(text="give" if "OFFERING" in OF_ND else "Book", ids={"sidd":N["sidd"],"idd":N["idd"],"ac":OF_ND},text_color=(1, 1, 1, 1), md_bg_color=(0, 0, 0, 1),_min_height=2)
+            btn3.font_size = btn3.font_size - 5
+            btn3.bind(on_release=lambda btn: self.interested(btn,TP,TC))
+
+            sugst=TextInput(ids={"sidd":N["sidd"]},multiline=False,foreground_color=( 0,0,0, .8),background_color=(1, 1, 1,.8),size_hint=(None,None),size=(60,Window.size[1] / 29))
+            sugst.bind(text=tping)
+            pc=self.Price(N["sidd"],str(N["pr"])+" ??",OF_ND,sugst)
+            sugst.hint_text = str(pc[0])
+            sugst.font_size = sugst.font_size - 5
+            sugst.size=(30*len(sugst.hint_text),sugst.size[1])
+            sugst.bind(focus=focused)
+            sugst.bind(on_text_validate=unfocused)
+
+            comment = TextInput(hint_text=pc[1],ids={"sidd": N["sidd"]}, multiline=False, foreground_color=(0, 0, 0, .8),
+                                background_color=(1, 1, 1, .8), size_hint=(None, None), size=(60, Window.size[1] / 29))
+
+            comment.bind(text=COMMENT)
+            comment.bind(focus=focused)
+            comment.font_size = comment.font_size - 5
+            comment.size = (30 * len(comment.hint_text), comment.size[1])
+            comment.bind(on_text_validate=unfocused)
+
+            Del = MDRaisedButton(text="Delete", ids={"sidd": N["sidd"],"ac": OF_ND}, text_color=(1, 1, 1, 1),
+                                  md_bg_color=(0, 0, 0, 1), _min_height=2)
+            Del.font_size = Del.font_size - 5
+            # Del.bind(on_release=lambda btn: os.remove(self.ME["adress"][1]+"/"+OF_ND+"/jobs/"+n))
+            Del.bind(on_release=lambda btn:self.LOCAL_JOB(x=6,OF_ND=OF_ND))
+            Del.bind(on_release=lambda btn: GONE(LOC="5",PRC=None,OF_ND=OF_ND,comm=None,tmes=None,TS=None,DEL=btn))
+
+            grio.add_widget(btn)
+            grio.add_widget(sugst)
+            grio.add_widget(btn3)
+            grio.add_widget(btn2)
+            grio.add_widget(comment)
+            grio.add_widget(Del)
+            ones.add_widget(grio)
+            self.NEED.add_widget(ones)
+
+        self.OFF_NED.add_widget(HEADS)
+        scrowller.add_widget(self.NEED)
+        self.OFF_NED.add_widget(scrowller)
+        self.OFF_NED.add_widget(S_L_C_S)
+        self.DISAP(self.OFF_NED)
+
+    def countdown(self,btn,path_file):
+        def minus(R):
+            if not os.path.isfile(path_file):
+                return
+            N = eval(open(path_file, "r").read())
+            REMT=int(N.get("tm",str(24*60*60)))
+            if REMT > 0:
+                REMT -= 1
+
+                HOUR, remainder=divmod(REMT,3600)
+                MIN,SEC=divmod(remainder,60)
+                btn.text=f"{HOUR:02}:{MIN:02}:{SEC:02}"
+                N["tm"]=str(REMT)
+                open(path_file, "w").write(str(N))
+
+            else:
+                # btn.parent.remove_widget(btn)
+                os.remove(path_file)
+                self.LOCAL_JOB(x=5)
+
+        Clock.schedule_interval(minus,1)
 
     def OPTIONS(self):
         TR = Scatter(size_hint=(None, None), ids={"x": 20})
@@ -2038,13 +2365,14 @@ class RM(Screen):
             rect = RoundedRectangle( pos=(0, 0), radius=[20],size=(Window.size[0] / 8, Window.size[0] / 8))
 
         OPT = MDIconButton(icon="photos/bum.png", icon_size=Window.size[0] / 7.5, text_color=(0, 0, 1, 1), md_bg_color=(.7, .3, .4, 0),
-                           rounded_button=10,size_hint=(None, None),pos=(0,0),on_release=self.WORK, size = (Window.size[0]/12,Window.size[0]/12))
+                           rounded_button=10,size_hint=(None, None),pos=(0,0),on_release=self.SIDEBAR, size = (Window.size[0]/12,Window.size[0]/12))
+        OPT.bind(on_release=self.LOCAL_JOB)
         TR.add_widget(OPT)
 
         TR.size = (Window.size[0] / 5, Window.size[0] / 5)
         self.add_widget(TR)
 
-        TR.pos=(Window.size[0]/5,         (Window.size[1]-(Window.size[1] / 10)    -5)       )
+        TR.pos=(Window.size[0]/5,         (Window.size[1]-(Window.size[1] / 8.2)   )   )
 
     def MME(self,x=None):
         if not x :
@@ -2057,8 +2385,10 @@ class RM(Screen):
         send(sen)
         del dicti
         del x
+        del sen
 
     def WORK(self, bt, msg="Select jobs you can do up to 5. : \n ",found=None,zn=None):
+        # print(bt,">>",msg,">>",found,">>",zn)
         def ZN(button):
             if not button.text in zn.ids["zn"]:
                 if len(zn.ids["zn"]) == 1:
@@ -2069,7 +2399,10 @@ class RM(Screen):
                     return
                 button.md_bg_color = (.7, 1, .7, 1)
                 zn.ids["zn"].append(button.text)
-                zn.text="Receivers: "+button.text
+                if "textinput" in str(type(zn)) :
+                    zn.text = button.text
+                else:
+                    zn.text="Receivers: "+button.text
             else:
                 try:
                     button.md_bg_color = (1, .7, 0, .8)
@@ -2078,24 +2411,27 @@ class RM(Screen):
                 except:
                     pass
 
-        def Find(wd, tx,ZN):
+        def Find(wd, ZN):
+            tx=wd.text
             goten=[]
-            for e in self.JOBS:
-                if tx.lower().strip() in e.lower():
-                    goten.append(e)
+            with open("JBS.txt", "r") as JBS:
+                for e in JBS:
+                    if tx.lower().strip() in e.lower():
+                        goten.append(e)
 
-            Clock.schedule_once(lambda dt:self.WORK(bt=None,msg=None,found=goten,zn=ZN))
-        if not "JOBS" in dir(self):
+            Clock.schedule_once(lambda dt:self.WORK(bt=None,msg=msg,found=goten,zn=ZN))
+
+        if found == []:
             return
 
-        if found:
+        if found != None :
             for i in found:
                 button = CustomTB(text=i, md_bg_color=(.7, 1, .7, 1) if i in self.professios else (1, .7, 0, .8))  # ToggleButton
                 if zn:
                     button.bind(on_release=ZN)
                 else:
                     button.bind(on_release=self.SELECTION)
-                self.JBL.size = (self.JBL.size[0], self.JBL.size[1] + Window.size[1] / 10)
+                self.JBL.size = (self.JBL.size[0], self.JBL.size[1] + Window.size[1] / 20)
                 self.JBL.add_widget(button,index=len(self.JBL.children))
                 self.JBS.scroll_y=1.
             return
@@ -2116,21 +2452,22 @@ class RM(Screen):
                        scroll_type=['bars', 'content'], bar_width=10, bar_color=(1, 1, 0, 1), bar_margin=0,
                               pos_hint={"center_x": .5, "center_y": .45})
 
-        self.JBL = GridLayout(cols=1, size_hint=(1, None), spacing=Window.size[1] / 50, size=(1, Window.size[1] / 10),
-                              row_default_height=Window.size[1] / 25, row_force_default=True,pos_hint={"center_x": .5, "center_y": .45})
+        self.JBL = GridLayout(cols=1, size_hint=(1, None), spacing=Window.size[1] /50, size=(1, Window.size[1] / 10),
+                              pos_hint={"center_x": .5, "center_y": .45})
 
         find = MDTextField(size_hint_x=.64,hint_text=msg, hint_text_color_normal=(1, 5, .3, .8),icon_right="magnify",text_color_normal=(1, 1, 1, 1), pos_hint={"center_x": .5, "center_y": .91})
-        find.bind(text=lambda wd,tx:threading.Thread(target=Find,args=(wd,tx,zn,)).start())
+        find.bind(on_text_validate=lambda wd:threading.Thread(target=Find,args=(wd,zn,)).start())
         self.REL.add_widget(find)
 
-        for i in self.JOBS:#
-            button = CustomTB(text=i,md_bg_color=(.7, 1, .7, 1) if i in self.professios else (1, .7, 0, .8))  # ToggleButton
-            if zn:
-                button.bind(on_release=ZN)
-            else:
-                button.bind(on_release=self.SELECTION)
-            self.JBL.add_widget(button)
-            self.JBL.size = (self.JBL.size[0], self.JBL.size[1] + Window.size[1] / 10)
+        with open("JBS.txt", "r") as JBS:
+            for i in JBS:
+                button = CustomTB(text=i,md_bg_color=(.7, 1, .7, 1) if i in self.professios else (1, .7, 0, .8))  # ToggleButton
+                if zn:
+                    button.bind(on_release=ZN)
+                else:
+                    button.bind(on_release=self.SELECTION)
+                self.JBL.add_widget(button)
+                self.JBL.size = (self.JBL.size[0], self.JBL.size[1] + Window.size[1] / 20)
 
         self.JBS.add_widget(self.JBL)
         self.REL.add_widget(self.JBS)
@@ -2159,7 +2496,7 @@ class RM(Screen):
 
     def SELECTION(self, button):
 
-        if not button.text in self.professios :
+        if not button.text.replace("\n","") in self.professios :
             if len(self.professios) == 5:
                 try:
                     vibrator.vibrate(1/50)
@@ -2167,11 +2504,11 @@ class RM(Screen):
                     pass
                 return
             button.md_bg_color = (.7, 1, .7, 1)
-            self.professios.append(button.text)
+            self.professios.append(button.text.replace("\n",""))
         else:
             try:
                 button.md_bg_color=(1,.7,0,.8)
-                self.professios.remove(button.text)
+                self.professios.remove(button.text.replace("\n",""))
             except:
                 pass
         print(self.professios)
@@ -2185,6 +2522,12 @@ class RM(Screen):
                 if "GG" in dir(self):
                     if not MESS["data"].get("sidd", 0) in XM:
                         Clock.schedule_once(lambda CLO: self._layers(s=MESS["data"]))
+                        XM.append(MESS["data"]["sidd"])
+                        MESS={}
+
+            if MESS.get("action", 0) in   ["OFFERING" , "LOOKING_FOR"]:
+                    if not MESS["data"].get("sidd", 0) in XM:
+                        Clock.schedule_once(lambda CLO: self.LOCAL_JOB(OF_ND=MESS.get("action","LOOKING_FOR").replace("_"," ")))
                         XM.append(MESS["data"]["sidd"])
                         MESS={}
 
@@ -2233,6 +2576,7 @@ class RM(Screen):
                 except:
                     MESS={}
                     pass
+                print(MESS)
 
                 if MESS.get("action", 0) == "src":
                     print("MESS ",MESS)
@@ -2242,6 +2586,11 @@ class RM(Screen):
                             XM.append(MESS["data"]["sidd"])
                             # MESS = {}
 
+                if MESS.get("action", 0) in ["OFFERING", "LOOKING_FOR"]:
+                    if not MESS["data"].get("sidd", 0) in XM:
+                        Clock.schedule_once(lambda CLO: self.LOCAL_JOB(x=None,OF_ND=MESS.get("action","LOOKING FOR").replace("_", " ")))
+                        XM.append(MESS["data"]["sidd"])
+                        MESS = {}
 
                 if MESS.get("action",0) == "cht":
                     if "comg" in dir(self):
@@ -2278,7 +2627,6 @@ class RM(Screen):
 
                 ##################################################################################################
 
-
             if platform != "android" :
                 Clock.schedule_once(self.RECEIVER)
         # THR = threading.Thread(target=self.RECEIVER, args=(4,))
@@ -2296,9 +2644,13 @@ class RM(Screen):
         self.add_widget(self.TR)
 
     def _files(self,dir,rev=True):
-        FILES = [f.name for f in pathlib.Path(dir).iterdir()]
-        FILES.sort(key=lambda x: os.stat(os.path.join(dir, x)).st_mtime, reverse=rev)
-        return FILES
+        try:
+            FILES = [f.name for f in pathlib.Path(dir).iterdir()]
+            FILES.sort(key=lambda x: os.stat(os.path.join(dir, x)).st_mtime, reverse=rev)
+            return FILES
+        except Exception as e:
+            Logger.info(f"COULD NOT GET LIST OF FILES IN _files(). REASON: {e}")
+            return []
 
     def send_message(self,DD,comment=None,inbox=None):
         "paths are diffrent according to device, don't include paths"
@@ -2312,9 +2664,9 @@ class RM(Screen):
             #     inbx, cht, zone
                                                   #          "prfl": dr() + "contacts/" + self.ME["idd"] + "/" + self.ME["idd"] + ".png",
             bsn = {"action": "inbx", "zone": self.ME["adress"], "org": self.ME["Name"][0], "sidd": sidd, "schm":schm,"msg": msg,
-                   "chats": {},
+                   "chats": {}, "bl":self.ME.get("bl","0"),
                    'subject': self.ME["busy"], "BUSY": [], "pht": pht, "idd": self.ME["idd"],
-                   "day": time.strftime("%d/%m/%y %H:%M:%S")}
+                   "day": time.strftime("%d/%m/%y %H:%M:%S"),"lk":self.ME.get("lk","0")}
             # json.dump(bsn,open(dr()+"Activities/"+schm,"w"))
             pickle.dump(bsn, open(schm +".bin", "wb"))
             if not os.path.isdir(schm):
@@ -2325,7 +2677,7 @@ class RM(Screen):
             try:
                 send(bsn)
                 # bsn = {"bsn": bsn, "schm": schm}
-                # self.PROFILE(iddd=None, update_new=bsn)
+                self.PROFILE(iddd=None, update_new=bsn)
                 self.PROFILE(iddd=None, update_new=bsn)
             except Exception as e:
                 print(e)
@@ -2336,23 +2688,26 @@ class RM(Screen):
 
         if not comment:
             schm,msg , pht,sidd =  DD["schm"], DD["msg"],DD["pth"], DD["sidd"]
+            tag=DD["tg"]
+            print(DD)
             schm = schm.replace(".bin", "").replace(".json", "")
 
             if msg is None and pht is None :
                 return
-                                                   #  "prfl": dr() + "contacts/" + self.ME["idd"] + "/" + self.ME["idd"] + ".png",
 
-            bsn = {"action": "zone", "zone":self.ME["adress"],"org": self.ME["Name"][0],"sidd":sidd, "msg": msg,"chats":{},"schm":schm,
-                   'subject': self.ME["busy"], "BUSY": [], "pht": pht, "idd": self.ME["idd"],"day":time.strftime("%d/%m/%y %H:%M:%S")}
-            # json.dump(bsn,open(dr()+"Activities/"+schm,"w"))
+
+            bsn = {"action": "zone", "zone":self.ME["adress"],"org": self.ME["Name"][0],"sidd":sidd, "msg": msg,"chats":{},"schm":schm,"bl":self.ME.get("bl","0"),
+                   'subject': self.ME["busy"], "BUSY": [], "pht": pht, "idd": self.ME["idd"],"day":time.strftime("%d/%m/%y %H:%M:%S"),"lk":self.ME.get("lk","0")}
+            if tag != [] :
+                bsn["tg"]=tag[0].replace("\n","")
+
             pickle.dump(bsn, open(dr() + "Activities/" + schm+".bin", "wb"))
             if not os.path.isdir(dr()+"Activities/"+schm):
                 os.mkdir(dr()+"Activities/"+schm)
-            # pickle.dump(bsn, open(dr()+"Activities/"+dir+"/"+file,"wb"))
+
 
             try:
-                # self.zchat(POS=None, schm=schm,ME=bsn)
-                # bsn["prfl"]=self.ME["idd"] + ".png"#
+                self.zchat(POS=None, schm=schm,ME=bsn)
                 send(bsn)
             except Exception as e:
                 print(e)
@@ -2368,7 +2723,7 @@ class RM(Screen):
             bsn = {"action": "cht", "zone": self.ME["adress"], "org": self.ME["Name"][0], "sidd": sidd, "schm":schm, "msg": msg,
                    "chats": {},
                    'subject': self.ME["busy"], "BUSY": [], "pht": pht, "idd": self.ME["idd"],
-                   "day": time.strftime("%d/%m/%y %H:%M:%S")}
+                   "day": time.strftime("%d/%m/%y %H:%M:%S"),"bl":self.ME.get("bl","0"),"lk":self.ME.get("lk","0")}
             # json.dump(bsn,open(dr()+"Activities/"+schm,"w"))
             pickle.dump(bsn, open(dr() + "Activities/" + schm + ".bin", "wb"))
             if not os.path.isdir(dr() + "Activities/" + schm):
@@ -2376,14 +2731,14 @@ class RM(Screen):
             try:
                 send(bsn)
                 # bsn={"bsn":bsn,"schm":schm}
-                # self.MSG(B=None,update_new=bsn)
+                self.MSG(B=None,update_new=bsn)
             except Exception as e:
                 print(e)
                 Logger.info(f"SHIDA NI: {e}")
 
     def org(self):
         try:
-            Clock.schedule_once(lambda cc: self.Lines_org(schm="/org/",pos=(20, self.DIST * 4 + 60)))
+            Clock.schedule_once(lambda cc: self.Lines_org(schm="/org/",pos=(42, self.DIST * 4 + 60)))
             Clock.schedule_once(lambda cc: threading.Thread(target=self.paidAdds).start(), 1 / 2)
         except Exception as e:
             Clock.schedule_once(lambda cc: threading.Thread(target=self.paidAdds).start(), 1 / 2)
@@ -2391,7 +2746,7 @@ class RM(Screen):
 
     def JobTalent(self):
         try:
-            Clock.schedule_once(lambda cc: self.Lines_JobTalent(schm="/JobTalent/",pos=(20, self.DIST * 2 + 20)))
+            Clock.schedule_once(lambda cc: self.Lines_JobTalent(schm="/JobTalent/",pos=(42, self.DIST * 2 + 20)))
             Clock.schedule_once(lambda cc: threading.Thread(target=self.zone_chats).start(), 1 / 2)
         except Exception as e :
             Clock.schedule_once(lambda cc: threading.Thread(target=self.zone_chats).start(), 1 / 2)
@@ -2399,14 +2754,14 @@ class RM(Screen):
 
     def paidAdds(self):
         try:
-            Clock.schedule_once(lambda cc: self.Lines_paidAdds(schm="/paidAdds/",pos=(20, self.DIST * 3 + 40)))
+            Clock.schedule_once(lambda cc: self.Lines_paidAdds(schm="/paidAdds/",pos=(42, self.DIST * 3 + 40)))
             Clock.schedule_once(lambda cc: threading.Thread(target=self.JobTalent).start(), 1 / 2)
         except Exception as e :
             Clock.schedule_once(lambda cc: threading.Thread(target=self.JobTalent).start(), 1 / 2)
             Logger.info(f"ORG: {e}")
 
     def zone_chats(self):
-        Clock.schedule_once(lambda cc: self.zchat(schm="/"+self.ME["adress"][1]+"/", POS=(20, self.DIST - (self.DIST / 3.3))))
+        Clock.schedule_once(lambda cc: self.zchat(schm="/"+self.ME["adress"][1]+"/", POS=(42, self.DIST - (self.DIST / 3.3))))
 
     def keys_path(self,dc, key, cur_path=[]):
         print("key: ",key," dict: ",dc)
@@ -2835,6 +3190,8 @@ class RM(Screen):
         else:
             send.bind(on_release=lambda c: self.send_message({"schm": schm.replace(".bin", "/").replace(".json","/") + "/" + sidd[-1], "msg": msg.children[0].text, "recipients":[DI["idd"]],"sidd": sidd[-1], "pth": pht},comment="ok"))
 
+        send.bind(on_release=lambda btn: os.remove("ch"))
+
         scren.add_widget(org)
         scren.add_widget(pic)
         scren.add_widget(send)
@@ -2946,15 +3303,10 @@ class RM(Screen):
         schm = iddd.ids["schm"]
         schm2 = iddd.ids["schm"] + "/chats/"
         if not os.path.isfile(schm + "/" + idd + ".json"):
+            print(schm + "/" + idd + ".json")
             return
         DIC = json.load(open(schm + "/" + idd + ".json", "r"))
         FILES = self._files(schm2)
-
-        # else:
-        #     DIC = {}
-        #     ord = {"idd": idd, "action": "PROF"}
-        #     th = threading.Thread(target=self.ORDER, args=(ord,))
-        #     th.start()
 
         RL = RelativeLayout(size_hint=(None, None), size=(Window.size[0] - 200, Window.size[1] / 2), ids={"x": 0},
                             pos=(200, 300))
@@ -2987,7 +3339,7 @@ class RM(Screen):
                           bar_color=(1, 1, 0, 1), bar_margin=0)
 
         self.pcomg = GridLayout(cols=1, orientation='bt-lr', spacing=40, size_hint=(1, None),
-                                size=(self.RL.size[0] / 2, (Window.size[1] / 6) * 2), col_default_width=sx,
+                                size=(RL.size[0] / 2, (Window.size[1] / 6) * 2), col_default_width=sx,
                                 col_force_default=True,
                                 row_default_height=sy, row_force_default=True)
 
@@ -3013,7 +3365,7 @@ class RM(Screen):
                          bar_width=10, bar_color=(1, 1, 0, 1), bar_margin=0)
 
 
-        GDW = GridLayout(rows=2, spacing=5, size_hint=(None, None), size=(RL.size[0] / 1.3, RL.size[1] / 2.7) )
+        GDW = GridLayout(rows=2, spacing=5, size_hint=(None, None), size=((RL.size[0] / 1.3)+2000, RL.size[1] / 2.7) )
                                                # col_default_width=RL.size[0] /2, col_force_default=True,
                                             #    row_default_height=(RL.size[1] / 2.5)/2, row_force_default=True
 
@@ -3022,7 +3374,7 @@ class RM(Screen):
                 ph = RelativeLayout(ids={"x": 0})
 
                 if len(itm)>1 :
-                    Im = AsyncImage(source=self.profile(itm[1].replace(".png",""),dir="Items"))
+                    Im = AsyncImage(source=self.profile(itm[1].replace(".png",""),dir="Items"))     #here
                     ph.add_widget(Im)
                     opn = MDRaisedButton(md_bg_color=(1, 1, 1, 0), elevation=0,ids={"idd": DIC.get("idd", "")}, rounded_button=10)
                     ph.add_widget(opn)
@@ -3048,20 +3400,81 @@ class RM(Screen):
 
         self.moveer(RL, pos=(50, randint(50, Window.size[1] // 1.8)))
         print(randint(50, Window.size[1] // 1.8))
+
     def RLD(self,Im):
         if len(Im.source) < 3:
             Im.reload()
         else:
             pass
             # threading.Thread(target=self.RLD,args=(Im,)).start()
+
     def MSG(self,B,update_new=None):
         "Each item has its own messages. when deleted, messges goes too"
         "each profile has its private chats,each idd with its chats list and images path"
 
-        def _like(t):
-            pass
-        def _block(t):
-            pass
+        def _like(idd,btn):
+            print("schm ",schm)
+            if not os.path.isdir('.lk'):
+                os.mkdir(".lk")
+            if idd in self._files(".lk"):
+                os.remove(".lk/"+idd)
+                btn.text=str(int(btn.text)-1)
+                l=int(DIC.get("lk",0))-1
+                DIC["lk"]=str(l)
+                if "contacts/" in schm:
+                    pickle.dump(DIC,open(dr()+schm.replace(".bin","").replace(".json","") + ".bin", "wb"))
+                else:
+                    pickle.dump(DIC, open(dr() +"Activities/"+ schm.replace(".bin", "").replace(".json", "").replace("Activities", "/") + ".bin", "wb"))
+
+                Dict = {"action": "lk","tg": idd, "sidd": str(uuid.uuid4()).replace("-","").replace("_","")[:12], "schm": schm,
+                        "idd": self.ME["idd"], "recipients": [DIC["idd"]],"zone": self.ME["adress"],
+                        "N": "-1"}
+                send(Dict)
+
+            else:
+                open(".lk/"+idd,"w").write(schm)
+
+                btn.text = str(int(btn.text) + 1)
+                l = int(DIC.get("lk", 0)) + 1
+                DIC["lk"] = str(l)
+                if "contacts/" in schm:
+                    pickle.dump(DIC, open(dr() + schm.replace(".bin", "").replace(".json", "") + ".bin", "wb"))
+                else:
+                    pickle.dump(DIC, open(dr() + "Activities/" + schm.replace(".bin", "").replace(".json", "").replace("Activities", "/") + ".bin","wb"))
+
+                Dict = {"action": "lk","tg":idd, "sidd": str(uuid.uuid4()).replace("-", "").replace("_", "")[:12], "schm": schm,
+                        "idd": self.ME["idd"], "recipients": [DIC["idd"]],"zone": self.ME["adress"],
+                        "N": "-1"}
+                send(Dict)
+
+        def _block(idd,btn):
+            if not os.path.isdir('.bl'):
+                os.mkdir(".bl")
+            if idd in self._files(".bl"):
+                os.remove(".bl/" + idd)
+                btn.text = str(int(btn.text) - 1)
+                l = int(DIC.get("bl", 0)) - 1
+                DIC["bl"] = str(l)
+                if "contacts/" in schm:
+                    pickle.dump(DIC, open(dr() + schm.replace(".bin", "").replace(".json", "") + ".bin", "wb"))
+                else:
+                    pickle.dump(DIC, open(dr() + "Activities/" + schm.replace("Activities/", "").replace(".bin", "").replace(".json", "") + ".bin","wb"))
+                Dict={"action": "bl","tg": idd, "sidd": str(uuid.uuid4()).replace("-","").replace("_","")[:12], "schm":schm, "zone": self.ME["adress"], "idd": self.ME["idd"],"recipients":[DIC["idd"]],"N":"-1"}
+                send(Dict)
+            else:
+                open(".bl/" + idd, "w").write(schm)
+
+                btn.text = str(int(btn.text) + 1)
+                l = int(DIC.get("bl", 0)) + 1
+                DIC["bl"] = str(l)
+                if "contacts/" in schm:
+                    pickle.dump(DIC, open(dr() + schm.replace(".bin", "").replace(".json", "") + ".bin", "wb"))
+                else:
+                    pickle.dump(DIC, open(dr() + "Activities/" + schm.replace("Activities/", "").replace(".bin", "").replace(".json", "") + ".bin","wb"))
+                Dict = {"action": "bl", "tg": idd,"sidd": str(uuid.uuid4()).replace("-","").replace("_","")[:12], "schm": schm, "zone": self.ME["adress"],"idd": self.ME["idd"], "recipients": [DIC["idd"]],
+                        "N": "1"}
+                send(Dict)
+
         def _talk(t):
             pass
         def Get(sch,Id,sv):
@@ -3094,15 +3507,22 @@ class RM(Screen):
             FILES = self._files(schm)
             DIC = pickle.load(open(B.ids["schm"] + ".bin", "rb"))
         else:
+            print("schm: ",B.ids["schm"])
             FILES = self._files(dr() + "Activities/" + schm.replace("Activities/","/"))
-            DIC = pickle.load(open(dr() + "Activities" + "/" + B.ids["schm"] + ".bin", "rb"))
+            DIC = pickle.load(open(dr() + "Activities" + "/" + B.ids["schm"].replace("Activities/","/").replace(".json","").replace(".bin","") + ".bin", "rb"))
+
+
+        try:
+            DIC["pht"].remove("")
+        except:
+            pass
 
         L=len(DIC.get("chats",[]))  # """{chat_idd{org, idd,pht,msg}}"""
 
         self.RL=RelativeLayout(size_hint=(None,None),size=(Window.size[0]-200, Window.size[1] / 2),ids={"x":0},pos=(0, 0))
         with self.RL.canvas.before:
             Color(B.ids["COLOR"][0],B.ids["COLOR"][1],B.ids["COLOR"][2],1)
-            rect = RoundedRectangle(pos=(0, 0), radius=[20], size=self.RL.size)  # Window.size[0]-200, Window.size[1]-200
+            rect = RoundedRectangle(source="back.jpg",pos=(0, 0), radius=[20], size=self.RL.size)  # Window.size[0]-200, Window.size[1]-200
 
         prof=RelativeLayout(size_hint=(None,None),size=(self.RL.size[0]/2, self.RL.size[0]/2),ids={"x":0},pos=(0, self.RL.size[1]-self.RL.size[0]/2))
         #
@@ -3152,28 +3572,48 @@ class RM(Screen):
         self.RL.add_widget(coms)
         coms.scroll_y=0
 
-        like =MDIconButton(text="27",text_color=(0,0,0,1),icon="photos/lk2.png",icon_size=self.RL.size[0] / 15,
-                           md_bg_color=(0, 0, 1, .4),size_hint=(None,None),size=(self.RL.size[0] / 8 , self.RL.size[0] / 4),pos_hint={'center_x': .09, 'center_y': .61})
+        lk=MDRaisedButton(text=str(DIC.get("lk",0)), text_color=(1,1,1, 1), icon_size=self.RL.size[0] / 15,
+                     md_bg_color=(0, 0, 1, 0), size_hint=(None, None), size=(self.RL.size[0] / 8, self.RL.size[0] / 4),
+                     pos_hint={'center_x': .09, 'center_y': .57})
+
+        like =MDIconButton(text="27",text_color=(1,1,1,1),icon="photos/lk2.png",icon_size=self.RL.size[0] / 15,
+                           md_bg_color=(0, 0, 1, .4),size_hint=(None,None),size=(self.RL.size[0] / 8 , self.RL.size[0] / 4),
+                           pos_hint={'center_x': .09, 'center_y': .61},on_release=lambda btn:_like(DIC["idd"],lk))
+
+
+        bl = MDRaisedButton(text=str(DIC.get("bl", 0)),  text_color=(1,1,1, 1),
+                            icon_size=self.RL.size[0] / 15, md_bg_color=(0, 0, 1, 0), size_hint=(None, None),
+                            size=(self.RL.size[0] / 8, self.RL.size[0] / 4), pos_hint={'center_x': .24, 'center_y': .57})
 
         block = MDIconButton(icon="photos/bl.png",icon_size=self.RL.size[0] / 15, md_bg_color=(0, 0, 1, .4), rounded_button=30, size_hint=(None,None),
                              size=(self.RL.size[0] / 4 , self.RL.size[0] / 4), pos_hint={'center_x': .24, 'center_y': .61})
+        lk.font_size=lk.font_size-3
+        bl.font_size = bl.font_size - 3
+
 
         talk = MDIconButton(icon="photos/talk.png", icon_size=self.RL.size[0] / 15,md_bg_color=(0, 0, 1, .4), rounded_button=30, size_hint=(None, None),
                              size=(self.RL.size[0] / 4, self.RL.size[0] / 4), pos_hint={'center_x': .39, 'center_y': .61})
 
+        lk.bind(on_release=lambda btn:_like(DIC["idd"],lk))
+        bl.bind(on_release=lambda btn: _block(DIC["idd"], bl))
+
         self.RL.add_widget(like)
+        self.RL.add_widget(lk)
+        lk.elevation=0
         self.RL.add_widget(block)
+        self.RL.add_widget(bl)
+        bl.elevation=0
         self.RL.add_widget(talk)
 
         _msg = RelativeLayout(size_hint=(1, .4), pos_hint={'center_x': .5, 'center_y': .35})
-        msg = S_TextInputApp(Text=DIC["msg"], BG=(1, 1, 1, 0), FG=(0, 0, 0, .6))
+        msg = S_TextInputApp(Text=DIC["msg"], BG=(1, 1, 1, .3), FG=(0, 0, 0, .6))
         _msg.add_widget(msg)
 
         self.RL.add_widget(_msg)
         L=len(DIC.get("pht",[]))
-        PHTs=ScrollView(size_hint=(None, None), size=((Window.width/4)*L+200,Window.size[1] / 8 ), pos=(3,3), do_scroll_x=True,
+        PHTs=ScrollView(size_hint=(1,.2), pos=(3,1), do_scroll_x=True,
                          do_scroll_y=False, scroll_type=['bars', 'content'], bar_width=10, bar_color=(1, 1, 0, 1),bar_margin=0)
-        P_S=GridLayout(cols=L, spacing=5, size_hint=(None, None),size=((Window.width/4)*L+200,Window.size[1] / 8 ),col_default_width=Window.width/4,col_force_default=True) #
+        P_S=GridLayout(cols=L, spacing=3, size_hint=(None, None),size=((Window.width/4)*L+200,Window.size[1] / 8 ),col_default_width=Window.width/4,col_force_default=True) #
 
         cnt=0
         for im in DIC.get("pht",[]) :
@@ -3183,7 +3623,7 @@ class RM(Screen):
             cnt+=1
             cli=RelativeLayout()
             cli.add_widget(AsyncImage(source=im,pos_hint={'center_x': .5,'center_y': .5}))
-            b=MDRaisedButton(ids={"iddd":im},md_bg_color=(1,1,1,0), rounded_button=20,size_hint=(.25,.1), pos_hint={'center_x': .5,'center_y': .5} )
+            b=MDRaisedButton(ids={"iddd":im},md_bg_color=(1,1,1,0), rounded_button=20,size_hint=(.25,.5), pos_hint={'center_x': .5,'center_y': .5} )
             b.bind(on_release=lambda xi: self.Loader(x=xi.ids["iddd"],name=b.ids["iddd"]+"@"+str(cnt)))
             cli.add_widget(b)
             b.elevation=0
@@ -3206,8 +3646,7 @@ class RM(Screen):
                              "rb"))
                     yield ORG
 
-            def Get(sch, sv):  # 5
-                print("scroll_x >>> ",sv.scroll_x)
+            def Get(sch, sv):
                 if sv.scroll_x > 1.:
                     try:
                         vibrator.vibrate(1 / 20)
@@ -3217,10 +3656,14 @@ class RM(Screen):
                         DICT = next(self.zchat_Generator)
                         self.l_r.cols = self.l_r.cols + 1
                         self.l_r.size = (self.l_r.size[0] + (Window.width / 1.3), Window.size[1] / 4)  # Window.width / 1.3  size[0]+(Window.width / 1.5)
-                        self.l_r.add_widget(self.caro(DICT, schm=sch + "/" + DICT["sidd"]))
+                        self.l_r.add_widget(self.caro(DICT, schm=self.ME["adress"][1]+ "/" + DICT["sidd"]))
                     except Exception as e:
+                        dic = {"action": "next", "zone": self.ME["adress"], "idd": self.ME["idd"],
+                               "recipients": [self.ME["idd"]], "schm": self.ME["adress"][1]+"/", "sidd": str(uuid.uuid4())[:3]}  # "Id":Id
+                        send(dic)
                         print("END.")
                         return
+
 
             if me:
                 """
@@ -3270,7 +3713,7 @@ class RM(Screen):
                              do_scroll_y=False, scroll_type=['bars', 'content'], bar_width=10, bar_color=(1, 1, 0, 1),
                              bar_margin=0)
 
-            self.l_r = GridLayout(orientation='lr-bt',cols=4 ,ids={"lv":schm}, spacing=5, size_hint=(None, None), col_default_width=Window.width / 1.5,
+            self.l_r = GridLayout(orientation='lr-bt',cols=6 ,ids={"lv":schm}, spacing=5, size_hint=(None, None), col_default_width=Window.width / 1.5,
                              col_force_default=True, size=(Window.width / 1.3, Window.size[1] / 4),
                              pos_hint={'center_x': .5, 'center_y': .5})  # +200)+(Window.width / 1.5)
 
@@ -3281,12 +3724,11 @@ class RM(Screen):
             hist=""
             self.l_r.add_widget(caro({}))
 
-            for ii in range(2):  # 3  few first elements
+            for ii in range(4):  # 3  few first elements
                 try:
                     x = next(self.zchat_Generator)
                 except Exception as e:
                     DICT = {}
-                    print("OVER: ", e)
                     # return
                     break
                 if x["sidd"] != hist:
@@ -3310,7 +3752,8 @@ class RM(Screen):
 
             THR = threading.Thread(target=self.RECEIVER, args=(4,))
             THR.start()                                             #    AttributeError: 'RM' object has no attribute 'JobTalent_LG'. Did you mean: 'JobTalent'?
-
+            Clock.schedule_once(self.SS,4)
+            # self.SS()
 
         def caro( DI):
             def GAL(x=None):
@@ -3398,7 +3841,12 @@ class RM(Screen):
             sidd=[]
             send.bind(on_press=lambda bt:sidd.append(SIDD()))
             send.bind(on_release=lambda c: self.send_message({"tg":targ.ids["zn"],"schm":self.ME["adress"][1]+"/"+sidd[-1],"sidd":sidd[-1],"msg":msg.children[0].text,"pth": pht})) # .children[0]
-            # _msg.children[0].children[0].size = scren.size
+            try:
+                if os.path.isfile("ch"):
+                    send.bind(on_release=lambda btn: os.remove("ch"))
+
+            except:
+                pass
 
             return scren
         if ME :
@@ -3418,7 +3866,7 @@ class RM(Screen):
 
                 SLines(schm=schm ,pos=POS)
 
-    def SS(self):
+    def SS(self,clock):
         # NINAANZIA HAPA NA TUMA BARUA
         self.SSR = RelativeLayout( size=(Window.size[0]/2,(Window.size[1]/100)*15),pos_hint={'center_x': .72, 'center_y': .88})   # size_hint=(.5, .09),
 
@@ -3546,6 +3994,9 @@ class RM(Screen):
                                         Window.size[1] / 6)  # Window.width / 1.3  size[0]+(Window.width / 1.5)
                     self.org_LG.add_widget(self.caro(DICT, schm=sch + "/" + DICT["sidd"]))
                 except Exception as e:
+                    dic = {"action": "next", "zone": self.ME["adress"], "idd": self.ME["idd"],
+                           "recipients": [self.ME["idd"]], "schm": sch,"sidd": str(uuid.uuid4())[:3]}  # "Id":Id
+                    send(dic)
                     print("END.")
                     return
 
@@ -3553,8 +4004,7 @@ class RM(Screen):
             """
             schm=dicti["schm"]+"/"+dicti["sidd"]     ?????????
             """
-            self.org_LG.add_widget(self.caro(DI=dicti, schm=dicti["schm"] + "/" + dicti["sidd"]),
-                                   index=len(self.org_LG.children))
+            self.org_LG.add_widget(self.caro(DI=dicti, schm=dicti["schm"]),index=len(self.org_LG.children)) #  + "/" + dicti["sidd"]
             self.org_LG.size = (self.org_LG.size[0] + (Window.width / 1.5), Window.size[1] / 6)
             return
 
@@ -3581,7 +4031,6 @@ class RM(Screen):
                 DICT = next(self.org_Generator)
             except Exception as e:
                 DICT = {}
-                print("OVER: ", e)
                 # return
                 break
             self.org_LG.add_widget(self.caro(DICT, schm=schm + "/" + DICT["sidd"]))
@@ -3621,6 +4070,9 @@ class RM(Screen):
                                               Window.size[1] / 6)  # Window.width / 1.3  size[0]+(Window.width / 1.5)
                     self.JobTalent_LG.add_widget(self.caro(DICT, schm=sch + "/" + DICT["sidd"]))
                 except Exception as e:
+                    dic = {"action": "next", "zone": self.ME["adress"], "idd": self.ME["idd"],
+                           "recipients": [self.ME["idd"]], "schm": sch, "sidd": str(uuid.uuid4())[:3]}  # "Id":Id
+                    send(dic)
                     print("END.")
                     return
 
@@ -3628,8 +4080,7 @@ class RM(Screen):
             """
             schm=dicti["schm"]+"/"+dicti["sidd"]     ?????????
             """
-            self.JobTalent_LG.add_widget(self.caro(DI=dicti, schm=dicti["schm"] + "/" + dicti["sidd"]),
-                                         index=len(self.JobTalent_LG.children))
+            self.JobTalent_LG.add_widget(self.caro(DI=dicti, schm=dicti["schm"] ),index=len(self.JobTalent_LG.children)) # + "/" + dicti["sidd"]
             self.JobTalent_LG.size = (self.JobTalent_LG.size[0] + (Window.width / 1.5), Window.size[1] / 6)
             return
 
@@ -3649,15 +4100,13 @@ class RM(Screen):
                                        pos_hint={'center_x': .5, 'center_y': .5})  # 3
 
         scren = RelativeLayout(size_hint=(1., 1.))
-        self.JobTalent_Generator = generator(self.JobTalent_LG)  # 2
-        print("self.JobTalent_Generator: ", self.JobTalent_Generator)
+        self.JobTalent_Generator = generator(self.JobTalent_LG)
 
         for x in range(2):  # 3  few first elements
             try:
                 DICT = next(self.JobTalent_Generator)
             except Exception as e:
                 DICT = {}
-                print("OVER: ", e)
                 # return
                 break
             self.JobTalent_LG.add_widget(self.caro(DICT, schm=schm + "/" + DICT["sidd"]))
@@ -3697,6 +4146,9 @@ class RM(Screen):
                                              Window.size[1] / 6)  # Window.width / 1.3  size[0]+(Window.width / 1.5)
                     self.paidAdds_LG.add_widget(self.caro(DICT, schm=sch + "/" + DICT["sidd"]))
                 except Exception as e:
+                    dic = {"action": "next", "zone": self.ME["adress"], "idd": self.ME["idd"],
+                           "recipients": [self.ME["idd"]], "schm": sch, "sidd": str(uuid.uuid4())[:3]}  # "Id":Id
+                    send(dic)
                     print("END.")
                     return
 
@@ -3704,8 +4156,8 @@ class RM(Screen):
             """
             schm=dicti["schm"]+"/"+dicti["sidd"]     ?????????
             """
-            self.paidAdds_LG.add_widget(self.caro(DI=dicti, schm=dicti["schm"] + "/" + dicti["sidd"]),
-                                        index=len(self.paidAdds_LG.children))
+            self.paidAdds_LG.add_widget(self.caro(DI=dicti, schm=dicti["schm"] ),
+                                        index=len(self.paidAdds_LG.children)) # + "/" + dicti["sidd"]
             self.paidAdds_LG.size = (self.paidAdds_LG.size[0] + (Window.width / 1.5), Window.size[1] / 6)
             return
 
@@ -3725,15 +4177,14 @@ class RM(Screen):
                                       pos_hint={'center_x': .5, 'center_y': .5})  # 3
 
         scren = RelativeLayout(size_hint=(1., 1.))
-        self.paidAdds_Generator = generator(self.paidAdds_LG)  # 2
-        print("self.paidAdds_Generator: ", self.paidAdds_Generator)
+        self.paidAdds_Generator = generator(self.paidAdds_LG)
 
         for x in range(2):  # 3  few first elements
             try:
                 DICT = next(self.paidAdds_Generator)
             except Exception as e:
                 DICT = {}
-                print("OVER: ", e)
+
                 # return
                 break
             self.paidAdds_LG.add_widget(self.caro(DICT, schm=schm + "/" + DICT["sidd"]))
@@ -3804,7 +4255,7 @@ class RM(Screen):
                 DICT=next(self.Generator)
             except Exception as e :
                 DICT = {}
-                print("OVER: ",e)
+
                 # return
                 break
             self.LG.add_widget(self.caro(DICT, schm=schm +"/"+ DICT["sidd"]))
@@ -3823,7 +4274,49 @@ class RM(Screen):
         # self.LG.remove_widget(self.LG.children[-1])
 
     def caro(self,DI,schm=None,idd=None,clr=None):  # file=uuid    dir  kyeg
-        # print("DI: ",DI)
+        def DELT(btn):
+            pth=dr()+"Activities/"+btn.ids["schm"].replace(".bin","")
+            fil=dr()+"Activities/"+btn.ids["schm"].replace(".bin","")+".bin"
+
+            if os.path.isfile(fil):
+                os.remove(fil)
+            if os.path.isdir(pth):
+                os.rmdir(pth)
+            for pic in btn.ids["pics"]:
+                if os.path.isfile(dr()+"Items/"+pic):
+                    print("DELETE MEDIA TOO")
+                else:
+                    if os.path.isfile(pic):
+                        print("DELETE MEDIA TOO")
+            btn.parent.parent.remove_widget(btn.parent)
+
+        def Afirm(btn):
+            B=Button(size_hint=(1,1),background_color=(0,0,0,.8))
+            self.add_widget(B)
+            rel=RelativeLayout(size_hint=(.6,.15),pos_hint={"center_x":.5,"center_y":.5})
+            lab=Label(text="Deleting this message will delete All it comments, media and likes :",pos_hint={"center_x":.5,"center_y":.5})
+            lab.font_size=lab.font_size-3
+            yes=MDRaisedButton(on_press=lambda BT: DELT(btn),rounded_button=5,text="Yes",pos_hint={"center_x":.8,"center_y":.01})
+            No=MDRaisedButton(rounded_button=5,text="Non",pos_hint={"center_x":.4,"center_y":.01})
+            rel.add_widget(lab)
+            rel.add_widget(No)
+            rel.add_widget(yes)
+
+            B.bind(on_release=lambda _: self.remove_widget(rel))
+            B.bind(on_release=lambda _: self.remove_widget(B))
+            No.bind(on_release=lambda _: self.remove_widget(rel))
+            No.bind(on_release=lambda _: self.remove_widget(B))
+            yes.bind(on_release=lambda _: self.remove_widget(rel))
+            yes.bind(on_release=lambda _: self.remove_widget(B))
+
+
+            self.add_widget(rel)
+
+        try:
+            DI["pht"].remove("")
+        except:
+            pass
+
         sms=DI.get("msg","No Message")
         R, G, B, O = randint(0, 100) / 100, randint(30, 100) / 100, randint(30, 100) / 100, 1
         scren = RelativeLayout(size_hint=(1,1))
@@ -3833,7 +4326,7 @@ class RM(Screen):
         if len(DI.get("pht", [])) > 0:
             with scren.canvas.before:
                 Color(G,B,R,O)  # Color(1,1,1,1)
-                rect2 = RoundedRectangle( source=DI["pht"][0],pos=((Window.size[0] / 1.5)-Window.size[0] / 6, 0), radius=[40],size=(Window.size[0] / 6, Window.size[0] / 6))
+                rect2 = RoundedRectangle( source=DI["pht"][0],pos=((Window.size[0] / 1.5)-Window.size[0] / 6, 0), radius=[70],size=(Window.size[0] / 7, Window.size[0] / 7))
 
         org=MDRaisedButton(text=DI["org"], icon="pencil",text_color=(0,0,1,1),md_bg_color=(1,1,1,1), rounded_button=20,size_hint=(.25,.1), pos_hint={'center_x': .2,'center_y': .8})
 
@@ -3842,12 +4335,18 @@ class RM(Screen):
         subject=MDRaisedButton(text=DI.get("subject","No subject"), text_color=(1,1,1,1),md_bg_color=(0,0,0,.6), rounded_button=10,size_hint=(.25,.1),
                                pos_hint={'center_x': .3,'center_y': .575})
 
+        delete = MDIconButton(icon="photos/trash.png" ,ids={"schm":schm.replace(".bin",""),"pics":DI["pht"]},text_color=(1, 1, 1, 1),icon_size=Window.size[0]/15,md_bg_color=(0, 0, 0, 0), size_hint=(.25, .1),
+                                 pos_hint={'center_x': .05, 'center_y': .45},on_release=Afirm)   # 575
+
+
         date=MDRaisedButton(text=DI.get("day",""), text_color=(1,1,1,1),md_bg_color=(0,0,1,.4), rounded_button=10,size_hint=(.25,.1),
                                pos_hint={'center_x': .75,'center_y': .8})
+
+
         msg=TextInput(text=sms[:100]+"...",background_color=(1,1,1,0),foreground_color=(0,0,0,.6),size_hint=(.8,.5), pos_hint={'center_x': .5, 'center_y': .11})
 
         back = MDRaisedButton(md_bg_color=(1, 1, 1, 0), x=3,ids={"schm":schm.replace(".bin",""),"idd":DI["idd"],"dt":DI,"COLOR":[R,G,B,O]},
-                              rounded_button=10, size_hint=(.98, .98), pos_hint={'center_x': .5, 'center_y': .5},on_release=self.MSG)
+                              rounded_button=10, size_hint=(.98, .98), pos_hint={'center_x': .5, 'center_y': .3},on_release=self.MSG)
 
         back.bind(on_press=lambda x: send({"action":"contact","idd":DI["idd"],"sidd":str(uuid.uuid4())[:4]}))
 
@@ -3857,6 +4356,8 @@ class RM(Screen):
         scren.add_widget(back)
         scren.add_widget(msg)
         scren.add_widget(date)
+        scren.add_widget(delete)
+        # delete.elevation=0
 
 
         rect.size = (Window.size[0]/1.5, Window.size[1] / 6)
@@ -3869,8 +4370,8 @@ class RM(Screen):
 
         return scren
 
-
     def PERM(self,bt):
+        print(bt.ids)
         d=json.load(open("SD/conf/me.json","r"))
         g_new = GridLayout(cols=1, spacing=Window.size[0] / 180)  ##  ,col_default_width=Window.width/1.5,col_force_default=True,row_default_height=Window.height/9,row_force_default=True
 
@@ -3882,7 +4383,7 @@ class RM(Screen):
         for i in range(3):
             try:
                 BT=MDRaisedButton(text=textes[i], md_bg_color=(0,1,0, .8),rounded_button=8,
-                                            ids={"perm":d["perm"][i],"schm":PER[i],"data":bt.ids["data"]},size_hint=(.1, None),size=(1,Window.size[1]/24),pos_hint={'center_y': .6},
+                                            ids={"perm":d["perm"][i],"schm":PER[i],"data":bt.ids["data"],"files":bt.ids["pht"]},size_hint=(.1, None),size=(1,Window.size[1]/24),pos_hint={'center_y': .6},
                                                 on_release=lambda w:self.SND(w))
 
             except:
@@ -3892,11 +4393,8 @@ class RM(Screen):
             g_new.add_widget(BT)
             BT.bind(on_release=lambda b: new_popup.dismiss())
 
-
-
-
+        bt.ids["pht"] = []
         new_popup.open()
-
 
     def Add_item(self):
         global compt
@@ -3935,7 +4433,7 @@ class RM(Screen):
             old = w.text
 
         def TF():
-            BOIT=GridLayout(cols=2, spacing=5, size_hint=(None,None),size=(Window.width /1.5, Window.height / 18) , pos_hint={'center_x': .5, 'center_y': .07})
+            BOIT=GridLayout(cols=3, spacing=5, size_hint=(None,None),size=(Window.width /1.5, Window.height / 18) , pos_hint={'center_x': .5, 'center_y': .07})
 
             item = MDTextField(hint_text_color_normal=(1, .6, .3, .4),text_color_normal= (1, 1, 1, .3),text_color_focus= (1, 1, 1, 1),line_color_normal=(1, 1, 1, .8),
                                icon_right_color_normal=(1, .6, 1, .8), hint_text="Talent or Item "+str(compt+1),
@@ -3949,15 +4447,26 @@ class RM(Screen):
             #     item.focus=True
             BOIT.add_widget(item)
             notext=str(uuid.uuid4())[:5].replace("-","").replace(" ","").replace("_","")
-            phot = MDRaisedButton(text="...", md_bg_color=(.5, .6, 1, .25), rounded_button=20,ids={"data": self.Items}, size_hint=(.1, None),
-                                 size=(1, Window.size[1] / 24), pos_hint={'center_y': .6}, on_release=lambda x: self.PHT(txt=self.to_server[item.text]["idd"] if item.text != "" else notext,msg=item.text))
+
+            phot = MDRaisedButton(text="...", md_bg_color=(.5, .6, 1, .25), rounded_button=20,ids={"data": self.Items,"pht":[],"x":10}, size_hint=(.1, None),
+                                 size=(1, Window.size[1] / 24), pos_hint={'center_y': .6},
+                                  on_release=lambda x: self.PHT(txt=self.to_server[item.text]["idd"] if item.text != "" else notext,msg=item.text))
+            file=MDIconButton(text="+", icon="photos/f1.png",md_bg_color=(.5, .6, 1, .3),rounded_button=10,ids={"x":10},
+                           size_hint=(None, None),size=(Window.size[1]/24,Window.size[1]/24),pos_hint={'center_y': .6},on_release=lambda btn: self.LoadAny(snd))
+
+
+
             BOIT.add_widget(phot)
+            BOIT.add_widget(file)
             return BOIT
 
         compt=0
         self.to_server={}
 
         self.All=GridLayout(cols=2, spacing=5, size_hint=(.92,.11),  pos_hint={'center_x': .5, 'center_y': .05})
+        with self.All.canvas.before:
+            Color(0,0,0, randint(0,100)/100)
+            self.rideau = Rectangle(pos=(0,0), size=(Window.width, (Window.height/100)*13) )
 
         my_spin = ScrollView(size_hint=(.8,1), pos_hint={'center_x': .5, 'center_y': .5},
                              do_scroll_x=True, do_scroll_y=False, scroll_type=['bars', 'content'], bar_width=1,bar_color=(1, 1, 0, 1), bar_margin=0)
@@ -3970,8 +4479,8 @@ class RM(Screen):
         grio.size=((Window.size[0]/1.3)*len(grio.children),1)
         grio.cols=compt+1
 
-        snd=MDIconButton(text="+", icon="photos/s1.png",md_bg_color=(.5, .6, 1, .3),rounded_button=20,
-                           ids={"data":self.Items},size_hint=(.1, None),size=(1,Window.size[1]/24),pos_hint={'center_y': .6},on_release=self.PERM)
+        snd=MDIconButton(text="+", icon="photos/s1.png",md_bg_color=(.5, .6, 1, .3),rounded_button=10,
+                           ids={"data":self.Items,"pht":[]},size_hint=(None, None),size=(Window.size[1]/24,Window.size[1]/24),pos_hint={'center_y': .6},on_release=self.PERM)
         snd.bind(on_release=clean)
         my_spin.add_widget(grio)
         self.All.add_widget(my_spin )
@@ -3979,6 +4488,7 @@ class RM(Screen):
         return self.All
 
     def SND(self,snd):
+        print(snd.ids)
         """{"perm":d["perm"][i],"schm":PER[i],"data":bt.ids["data"]}"""
         if self.to_server.get(None,0):
             del self.to_server[None]
@@ -3989,7 +4499,7 @@ class RM(Screen):
                 iD=str(uuid.uuid4())[:8]
 
             bsn = {"schm":snd.ids["schm"]+"/"+iD,"action": "B_U","org":self.ME["Name"][0],"msg":ky,"zone":self.ME["adress"],"day": time.strftime("%d/%m/%y %H:%M:%S"),
-                   'subject':self.ME["busy"] ,"BUSY":[[ky,self.to_server[ky]["lcl"]]],"pht":[self.to_server[ky]["lcl"]],"sidd":iD, "idd": self.ME["idd"]}
+                   'subject':self.ME["busy"] ,"BUSY":[[ky,self.to_server[ky]["lcl"]]],"pht":[self.to_server[ky]["lcl"]]+snd.ids["files"],"sidd":iD, "idd": self.ME["idd"]}
 
 
             #    THE SERVER WILL DO THIS TOO, WE CAN NOT SEND BIG DICT.  LET THE SERVER COMBINE WITH PREVIOUS
@@ -4013,10 +4523,12 @@ class RM(Screen):
                 json.dump(ALL, open(dr() + "contacts/" + self.ME["idd"] + "/" + self.ME["idd"] + ".json", "w"))
 
             send(bsn)
+            self.RECEIVER(json.dumps(bsn).encode())
+            pickle.dump(bsn,open(dr()+bsn["schm"]+".bin","wb"))
             self.to_server={}
         elif len(self.to_server) > 1 :   #   IT WILL NOT REACH TO PEOPLE TO SAVE THEIR MB, BUT SENT TO SERVER WITH YOU MB, IF ANY LOOKS FOR YOU, OKAY, FIND YOU
             msg=[]
-            pht=[]
+            pht=snd.ids["files"]
             for ky in self.to_server.keys():
                 msg.append(ky)
                 pht.append(self.to_server[ky]["lcl"])
@@ -4042,8 +4554,35 @@ class RM(Screen):
                     ALL = json.load(open(dr() + "contacts/" + self.ME["idd"] + "/" + self.ME["idd"] + ".json", "r"))
                     ALL["BUSY"].append([bsn["msg"], bsn["pht"][0]])
                     json.dump(ALL, open(dr() + "contacts/" + self.ME["idd"] + "/" + self.ME["idd"] + ".json", "w"))
+                self.RECEIVER(json.dumps(bsn).encode())
+                pickle.dump(bsn, open(dr()+bsn["schm"] + ".bin", "wb"))
             send(ALL)
+
             self.to_server={}
+
+    def LoadAny(self,btn_ids):
+
+        def on_selected(ob, val):
+            global choosen, result_ready,Im,List
+            if val[0].endswith((".png", ".PNG", ".jpg", ".JPG", "jpeg", "JPEG")):            #   , ".bmp", ".BMP", ".gif", ".GIF"
+                btn_ids.ids["pht"].append(val[0] )
+                print(btn_ids.ids)
+
+
+        from kivy.uix.filechooser import FileChooserListView, FileChooserIconView
+        R, G, B, O = randint(10, 20) / 100, randint(5, 20) / 100, randint(5, 20) / 100, 1
+        pg = GridLayout(cols=1, size_hint=(None,None),ids={"x":Window.size[0]/2},size=(Window.size[0]/1.5,Window.size[1]/2))
+        with pg.canvas.before:
+            Color(R,G,B,O)
+            rect = RoundedRectangle(pos=(0, 0), radius=[10], size=(pg.size[0]+pg.size[0]/5,pg.size[1]))
+
+        ll = [FileChooserListView(path=dr()), FileChooserIconView(path=dr())]
+        ch = ll[randint(1, 2) - 1]
+        ch.dirselect = False
+        ch.bind(selection=on_selected)
+
+        pg.add_widget(ch)
+        self.moveer(pg,pos=(100,200))
 
     def capture_image(self, instance):
         self.camera_preview.capture()
@@ -4145,6 +4684,8 @@ class RM(Screen):
         if x:
             if os.path.exists( dr()+"Items/"+os.path.basename(x)):   #  Path
                 self.CAPT(x=dr()+"Items/"+os.path.basename(x),name=name,p="1")
+            elif os.path.isfile(x):
+                self.CAPT(x=x, name=name, p="1")
             else:
                 Path = x[x.index("/ACCOUNTS") + 1:]
                 self.CAPT(x=x, name=name, p="1")
@@ -4161,7 +4702,6 @@ class RM(Screen):
         if up:
             if retour:
                 return
-            print("up: ",up)
             ftp.cwd("ACCOUNTS/"+self.ME["idd"]+"/" )
             bin = open(up, "rb")
             ftp.storbinary("STOR " + self.ME["idd"] + ".png", bin)
@@ -4171,7 +4711,6 @@ class RM(Screen):
             del bin
             del ftp
             del im
-
 
     def CAPT(self,x,name=None,p=None,widg=None):
         print("x: ", x, "name: ",name)
@@ -4249,7 +4788,6 @@ class RM(Screen):
         d = {"action": "LK", "kw": w.text, "ad":self.ME["adress"],"idd": self.ME["idd"],"sidd":str(uuid.uuid4()).replace("-","").replace("_","")[:4],"recipients": [self.ME["idd"]],"schm":"."}
         send(d)
 
-
     def sf(self,btn):
         if "Activities" in btn.ids["dt"]["schm"]:
             if not os.path.exists(dr() + btn.ids["dt"]["schm"].replace(".bin", "").replace(".json", "")):
@@ -4285,7 +4823,7 @@ class RM(Screen):
             self.GG.size[1] += Window.size[1] / 12
 
     def resiz(self, w, t=None):
-        print(w.size)
+
         self.seach.unbind(focus=self.resiz)
         if "xx" in dir(self):
             if self.xx >= (Window.size[1]/100)*78:
@@ -4307,7 +4845,7 @@ class RM(Screen):
             Clock.schedule_interval(self.big, 0)
 
     def big(self, x):                          #Window.size[0]/2,(Window.size[1]/100)*9
-        print(self.xx)
+
         if self.xx >= (Window.size[1]/100)*80:
             Clock.unschedule(self.big)
             self.seach.pos_hint = {'center_x': .5, 'center_y': .95}
@@ -4315,17 +4853,17 @@ class RM(Screen):
                 self.skat.size=self.SSR.size
             except:
                 pass
-            print(self.xx)
+            # print(self.xx)
         else:
             self.SSR.size = (Window.size[0]/2, self.xx)
             self.xx += Window.size[1]/100
 
     def _big(self, x):
-        print(self.xx)
+
         if self.xx >= 0.87:
             Clock.unschedule(self.big)
             self.seach.pos_hint = {'center_x': .5, 'center_y': .95}
-            print(self.xx)
+            # print(self.xx)
         else:
             self.SSR.size_hint = (.5, self.xx)
             self.xx += 0.08
@@ -4342,7 +4880,7 @@ class RM(Screen):
                 self.skat.pos = (Window.size[0] / 2.5, Window.size[1] - (Window.size[1] / 10))
             except:
                 pass
-            print(self.xx)
+            # print(self.xx)
         else:
             self.SSR.size = (Window.size[0]/2, self.xx)
             self.xx -= Window.size[1]/100
@@ -4354,7 +4892,7 @@ class RM(Screen):
             self.SSR.pos_hint={'center_x': .67, 'center_y': .88}
             self.seach.pos_hint={'center_x': .5, 'center_y': .5}
             self.btn.bind(on_release=self.resiz)
-            print(self.xx)
+
         else:
             self.SSR.size_hint = (.5, self.xx)
             self.xx -= 0.08
@@ -4370,6 +4908,7 @@ class Help(MDApp):
         # sm.add_widget(BS(name="business"))
         sm.add_widget(RM(name="reminder"))
         return sm
+
     def on_stop(self):
         # from plyer import gps
         # Environment = autoclass('android.os.Environment')
@@ -4384,7 +4923,7 @@ class Help(MDApp):
         #     return True
         # else:
         #     return True
-        return False
+        return True
 
     def on_pause(self):
         # from plyer import gps
@@ -4401,10 +4940,12 @@ class Help(MDApp):
         #     gps.start()
         #     return True
         # else:
-        #     return True
-        return False
+        return True
+        # return False
+
     def on_close(self):
-        return False
+        # return False
+        return True
 
 if __name__ == '__main__':
     Help().run()

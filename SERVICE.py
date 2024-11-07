@@ -19,6 +19,7 @@ from datetime import datetime,timedelta
 from kivy.logger import Logger           ##  Logger.info("GalleryApp: Opening gallery.")
 from kivy.config import Config
 import traceback
+import uuid
 
 
 
@@ -207,18 +208,19 @@ if platform == 'android':
         SERVER.bind(b'/To_server', To_server)
     except Exception as e:
         print("FALLURE IN root if platform == android: ", e)
+    ME = json.load(open("SD/conf/me.json", "r"))
 
 
 else:
     sd= "./SD/"
     # HOST = "0.0.0.0"
     # PORT = 8080
-    ME = json.load(open(dr()+"me.json", "r"))
-    # me = ME["idd"]
+    ME = json.load(open("SD/conf/me.json", "r"))
 
 
-me = json.load(open("SD/conf/me.json", "r"))["idd"]
-pseudo = json.load(open("SD/conf/me.json", "r"))["pseudo"]
+
+me = ME["idd"]
+pseudo = ME["pseudo"]
 
 # me = json.load(open(dr()+"conf/me.json", "r"))["idd"]
 # pseudo = json.load(open(dr()+"conf/me.json", "r"))["pseudo"]
@@ -228,7 +230,7 @@ RRR = []
 TTT = 0
 ALL = {}
 All_c = None
-DATAS = []
+DATAS = {}
 alias=None
 one=None
 ERRORS=[]
@@ -514,7 +516,85 @@ def his(data):
         json.dump(Y,open("History/"+data["st"], "w"))
     except Exception as e :
         print("RESON TO FAIL: ",e)
+
+async def Job(data):
+    """d = {"schm": "ab", "action": OF_ND.replace(" ", "_"), "receiver": self.ME["jb"],
+                     "zone": self.ME["adress"], 'sidd': sidd, 'idd': self.ME["idd"],"delete":DEL.ids["sidd"]}"""
+    try:
+        if data["data"].get("delete",0):
+            if os.path.isfile(data["data"]["zone"][1] + "/" + data["action"].replace("_", " ") + "/jobs/" + data["data"]["delete"]):
+                os.remove(data["data"]["zone"][1] + "/" + data["action"].replace("_", " ") + "/jobs/" + data["data"]["delete"])
+                if platform == "android":
+                    await call_main(data)
+                else:
+                    json.dump(data, open(dr() + "New_temp/" + data["data"]["sidd"] + ".json", "w"))
+                print(data["data"]["delete"] , " deleted")
+            return
+    except Exception as e :
+        print(f"PROBLEM WHEN DELETING: {e}", traceback.format_exc())
+    try:
+        if not os.path.exists(data["data"]["zone"][1] + "/" + data["action"].replace("_", " ")+"/jobs/"):
+            os.makedirs(data["data"]["zone"][1]+ "/" + data["action"].replace("_", " ")+"/jobs/")
+        if platform == "android":
+            open(data["data"]["zone"][1] + "/" + data["action"].replace("_", " ") + "/jobs/" + data["data"]["sidd"], "w").write(str(data["data"]))
+            await call_main(data)
+        else:
+            open(data["data"]["zone"][1] + "/" +data["action"].replace("_", " ") + "/jobs/" + data["data"]["sidd"], "w").write(str(data["data"]))
+            json.dump(data, open(dr() + "New_temp/" + data["data"]["sidd"] + ".json", "w"))
+    except Exception as e :
+        print(f"PROBLEM {e}",traceback.format_exc())
+
+async def GVM(data):
+    try:
+        if not os.path.exists(ME["adress"][1] + "/" + data["data"]["a2"]+"/bagainers/"+data["data"]["jb"]+"/"):
+            os.makedirs(ME["adress"][1] + "/" + data["data"]["a2"]+"/bagainers/"+data["data"]["jb"]+"/")
+        if platform == "android":
+            open(ME["adress"][1] + "/" + data["data"]["a2"]+"/bagainers/"+data["data"]["jb"]+"/"+data["data"]["idd"], "w").write(str(data["data"]))
+            await call_main(data)
+        else:
+            open(ME["adress"][1] + "/" + data["data"]["a2"]+"/bagainers/"+data["data"]["jb"]+"/"+data["data"]["idd"], "w").write(str(data["data"]))
+            json.dump(data, open(dr() + "New_temp/" + data["data"]["sidd"] + ".json", "w"))
+    except Exception as e :
+        print(f"PROBLEM {e}",traceback.format_exc())
+
 async def Emergency(data):
+
+    if data.get("action",0)== "blc":
+        acc=json.load(open("SD/conf/me.json","r"))
+        blcs=int(acc.get("bl","0"))+int(data["data"]["bl"])
+        acc["bl"]=str(blcs)
+        json.dump(acc,open("SD/conf/me.json","w"))
+        open(".bl/" + data["data"]["idd"], "w").write(data["data"]["schm"])
+
+        if "contacts/" in data["data"]["schm"]:
+            rson = pickle.load(open(dr()+data["data"]["schm"].replace(".bin", "").replace(".json", "")+".bin", "rb"))
+            blcs = int(rson.get("bl", "0")) + int(data["data"]["bl"])
+            rson["bl"] = str(blcs)
+            pickle.dump(rson, open(dr()+data["data"]["schm"].replace(".bin", "").replace(".json", "")+".bin", "wb"))
+        else:
+            rson = pickle.load(open(dr() + "Activities/"+data["data"]["schm"], "rb"))
+            blcs = int(rson.get("bl", "0")) + int(data["data"]["bl"])
+            rson["bl"] = str(blcs)
+            pickle.dump(rson, open(dr()+data["data"]["schm"].replace(".bin", "").replace(".json", "") + ".bin", "wb"))
+
+    if data.get("action", 0) == "lk":
+        acc = json.load(open("SD/conf/me.json", "r"))
+        lks = int(acc.get("lk", "0")) + int(data["data"]["lk"])
+        acc["lk"] = str(lks)
+        json.dump(acc, open("SD/conf/me.json", "w"))
+        open(".lk/" + data["data"]["idd"], "w").write(data["data"]["schm"])
+
+        if "contacts/" in data["data"]["schm"]:
+            rson = pickle.load(open(dr()+data["data"]["schm"].replace(".bin", "").replace(".json", "")+".bin", "rb"))
+            lks = int(rson.get("lk", "0")) + int(data["data"]["lk"])
+            rson["lk"] = str(lks)
+            pickle.dump(rson, open(dr()+data["data"]["schm"].replace(".bin", "").replace(".json", "") + ".bin", "wb"))
+        else:
+            rson = pickle.load(open(dr() + "Activities/"+data["data"]["schm"], "rb"))
+            lks = int(rson.get("lk", "0")) + int(data["data"]["lk"])
+            rson["lk"] = str(lks)
+            pickle.dump(rson, open(dr() + data["data"]["schm"].replace(".bin", "").replace(".json", "") + ".bin", "wb"))
+
     if data.get("action",0) == "src" :
 
         if platform == "android":
@@ -522,6 +602,7 @@ async def Emergency(data):
         else:
             json.dump(data, open(dr() + "New_temp/" + data["data"]["sidd"] + ".json", "w"))
         return
+
     if "Activities" in data["data"]["schm"]:
         if not os.path.exists(dr() + data["data"]["schm"].replace(".bin", "").replace(".json", "")):
             os.makedirs(dr() +  data["data"]["schm"].replace(".bin", "").replace(".json", ""))
@@ -534,11 +615,9 @@ async def Emergency(data):
             json.dump(data["data"], open(dr() + "New_temp/" + data["data"]["sidd"] + ".json", "w"))  # json
         return
 
-
     if not os.path.exists(dr()+"Activities/"+data["data"]["schm"].replace(".bin", "").replace(".json", "")):
         os.makedirs(dr()+"Activities/"+data["data"]["schm"].replace(".bin", "").replace(".json", ""))
-    pickle.dump(data["data"],open(dr()+"Activities/"+data["data"]["schm"]+".bin","wb"))        #     replace with pyzip
-
+    pickle.dump(data["data"],open(dr()+"Activities/"+data["data"]["schm"].replace(".bin", "").replace(".json", "")+".bin","wb"))        #     replace with pyzip
 
     if platform == "android" :
         await call_main(data["data"])
@@ -554,21 +633,33 @@ async def receive_messages(reader, writer):                  #  KEEP DELETING VA
         try:
             message = await reader.read(3000000000)
             if message:
-
+                # print(message)
                 SMS = message.decode("utf-8")
                 if isinstance(SMS, str):
                     if "}{" in SMS:
                         SMS = SMS.replace("}{", "}##{").split("##")
                         for i in SMS:
-                            # print("this was 2 dict corrupted:", i)
-                            DATAS.append(json.loads(i))
+                            dic = json.loads(i)
+                            try:
+                                DATAS[dic["data"].get("sidd",str(uuid.uuid4())[:8].replace("_", "").replace("-", ""))]=dic
+                            except Exception as e :
+                                DATAS[dic.get("sidd", str(uuid.uuid4())[:8].replace("_", "").replace("-", ""))] = dic
                     else:
-                        DATAS.append(json.loads(SMS))
+                        dic = json.loads(SMS)
+                        try:
+                            DATAS[dic["data"].get("sidd", str(uuid.uuid4())[:8].replace("_", "").replace("-", ""))] = dic
+                        except Exception as e:
+                            DATAS[dic.get("sidd", str(uuid.uuid4())[:8].replace("_", "").replace("-", ""))] = dic
                 else:
                     if isinstance(SMS, dict):
-                        DATAS.append(SMS)
+                        try:
+                            DATAS[SMS["data"].get("sidd", str(uuid.uuid4())[:8].replace("_", "").replace("-", ""))] = SMS
+                        except Exception as e:
+                            DATAS[SMS.get("sidd", str(uuid.uuid4())[:8].replace("_", "").replace("-", ""))] = SMS
 
-                for data in DATAS:
+                for DC in DATAS.keys():
+                    data=DATAS[DC]
+                    # print("DATAS: ",DATAS)
                     if data.get("_F_",0):# from server/ delete local
                         if data["_F_"] == "" :
                             os.remove(i for i in dr() + "Temp/" )
@@ -578,29 +669,40 @@ async def receive_messages(reader, writer):                  #  KEEP DELETING VA
                             try:
                                 if os.path.isfile(dr() + "Temp/" + data["_F_"]) :
                                     os.remove(dr() + "Temp/" + data["_F_"])
+                                    print("File ",data["_F_"]," deleted")
                                     ERRORS.pop(-1) if len(ERRORS) > 0 else print()
                             except Exception as e :
                                 print("Was there a file ? ....: ",e)
                                 ERRORS.append("Was there a file ? ....: "+str(e))
-                    if data.get("deliver"):   #   to server/ delete from host
+
+                    if data.get("deliver",0):   #   to server/ delete from host
                         writer.write(json.dumps({"sender": me, "deliver": data["deliver"], "action": "Received"}).encode())
                         await writer.drain()
-                        print('data["deliver"]',data)
+                        print('deliver:',data["deliver"],"data: ",data)
+                        # data={}
+                    # if not data.get("deliver"):
+                    #     if len(data)== 0:
+                    #         return
+                    #     print("HERE ??")
+                    #     if data.get("data"):
+                    #         if isinstance(data["data"], str):
+                    #             data3 = json.loads(data["data"])
+                    #             if data3.get("deliver"):      #     offer_need has no deliver in data, then here it resends to server as message containing M["data"]
+                    #                 writer.write(json.dumps({"sender": me, "deliver": data3["deliver"], "action": "Received"}))
+                    #         if isinstance(data["data"], dict):
+                    #             writer.write(json.dumps({"sender": me, "deliver": data["data"]["deliver"], "action": "Received"}))
 
-                    if not data.get("deliver"):
-                        if data.get("data"):
-                            if isinstance(data["data"], str):
-                                data3 = json.loads(data["data"])
-                                if data3.get("deliver"):
-                                    await send_chat_message(
-                                        {"sender": me, "deliver": data3["deliver"], "action": "Received"}, writer)
-                            if isinstance(data["data"], dict):
-                                writer.write(json.dumps({"sender": me, "deliver": data["data"]["sidd"], "action": "Received"}))
-
-                    if data.get("action") in ["inbx", "cht", "zone","next","B_U"]:
+                    if data.get("action") in ["inbx", "cht", "zone","next","B_U","blc","lk"]:
                         # Logger.info('["inbx", "cht", "zone"] ', data)
                         await Emergency(data)
                         await sound()
+
+                    if data.get("action") in ["OFFERING" , "LOOKING_FOR"]:
+                        await Job(data)
+
+                    if data.get("action", 0) == "GVM":
+                        await GVM(data)
+
                     if data.get("action") == "src":
                         # Logger.info('["inbx", "cht", "zone"] ', data)
                         await Emergency(data)
@@ -614,9 +716,11 @@ async def receive_messages(reader, writer):                  #  KEEP DELETING VA
                             json.dump(data["contact"],open( dr()+"contacts/"+ data["contact"]["idd"]+"/"+data["contact"]["idd"] + ".json", "w"))
                         except Exception as e:
                             print("Execption: ",e)
+
                     if data.get("action",0)!= "UPDATES2" :
                         # print("data: ",data)
                         pass
+
                     if data.get('action') != 'location':
                         pass
 
@@ -628,16 +732,17 @@ async def receive_messages(reader, writer):                  #  KEEP DELETING VA
 
                     if data.get("action", 0) == "trigger" :  #"stop_auto_scroll"
                         await al_list5(data["data"],dl=1)
+                        print()
 
                     if data.get("action2", 0) == "token" :  #
                         await sound()
                         json.dump(data["data"], open("tokens/" + data["idd"] + "@" + data["data"]["domain"] + ".json", "w"))
                         # open("stop_auto_scroll").write("ok")
 
-
                     if data.get("M", 0) == "ol":
                         # print("online: ",data["tm"]) #                   PUT SOUND HERE , AND REGESTER LAST ONLINE
                         pass
+
                     if data.get("message") == "Received":
                         pass
                     if data.get("action") == "rsp_login":
@@ -680,7 +785,7 @@ async def receive_messages(reader, writer):                  #  KEEP DELETING VA
                         All_c = data
 
                     try:
-                        DATAS.remove(data)
+                        del DATAS[DC]
                     except:
                         pass
             else:
@@ -790,7 +895,6 @@ async def send_chat_message(message=None,wrt=None,path=None):
                         json.dump(message, open("offline/" + message["acc"]["idd"] + "_" + message["acc"]["Name"] + "@" + message["acc"]["Post_Name"] + ".json", "w"))
                         asyncio.create_task(connector())
 
-
             # if message.get("action",0) =="B_U" :
             #     #########################################################################################
             #
@@ -882,7 +986,8 @@ async def send_chat_message(message=None,wrt=None,path=None):
             #     return
 
             #
-            if message.get("schm",0) or message.get("action",0) in ["B_U","next","zone","cht","inbx", "N_user" ] :
+            if message.get("schm",0) or message.get("action",0) in ["B_U","next","zone","cht","inbx", "N_user","lk","bl" ,'LOOKING_FOR', "OFFERING"] :
+
                 ###########################################################################
 
                 dt = message.get("sidd", None)
@@ -918,15 +1023,16 @@ async def send_chat_message(message=None,wrt=None,path=None):
 
 
                     for pht in message["data"]["pht"]:
-                        if not "ACCOUNTS/" in pht:
+                        if "ACCOUNTS/" in pht:
                             pass
                         else:
                             if os.path.isfile(pht):
+                                sidd=str(uuid.uuid4())[:5].replace("-","").replace(" ","").replace("_","")
                                 bin = open(pht, "rb")
-                                ftp.storbinary("STOR " + message["data"]["sidd"]+".png", bin)
+                                ftp.storbinary("STOR " + sidd+".png", bin)
                                 del bin
                                 message["data"]["pht"].remove(pht)
-                                message["data"]["pht"].append("ACCOUNTS/"+message["data"]["idd"]+"/"+"Items"+"/"+message["data"]["sidd"]+".png")  #  WHAT ABOUT 2 PHOTOS ? WILL THEY HAVE THE SAME NAME SIDD ?
+                                message["data"]["pht"].append("ACCOUNTS/"+message["data"]["idd"]+"/"+"Items"+"/"+ sidd +".png")  #  WHAT ABOUT 2 PHOTOS ? WILL THEY HAVE THE SAME NAME SIDD ?
 
                 if message.get("data", 0):
                     if message["data"].get("BUSY", 0):
@@ -968,8 +1074,12 @@ async def send_chat_message(message=None,wrt=None,path=None):
                     writer.write(data.encode())
                     await writer.drain()
                 except:
-                    json.dump(message, open("offline/" + message["data"]["sidd"] + ".json", "w"))
+                    # try:
+                        # json.dump(message, open("offline/" + message["data"]["sidd"] + ".json", "w"))
                     asyncio.create_task(connector())
+                    # except:
+                        # json.dump(message, open("offline/" + message["sidd"] + ".json", "w"))
+                        # asyncio.create_task(connector())
                     try:
                         del res["aime"]
                     except:
@@ -977,7 +1087,7 @@ async def send_chat_message(message=None,wrt=None,path=None):
                     res["status"] = "pain"
 
             else:
-                print(message)
+                print("else:",message)
                 ########################################################################
 
                 dt = message.get("sidd", None)
@@ -990,7 +1100,12 @@ async def send_chat_message(message=None,wrt=None,path=None):
                         if not os.path.isfile(dr() + "Temp/" + dt["sidd"] + ".json"):
                             json.dump(message, open(dr() + "Temp/" + dt + ".json", "w"))
                 #######################################################################
-
+                if not message.get("data", 0):
+                    r = message.get("recipients", [me])
+                    action = message.get("action", 0)
+                    idd = message.get("idd", "0788835687")
+                    message = {"action": action, "recipients": r, "data": message, "idd": idd,
+                               "sender": message.get("sender", "")}
 
                 data = json.dumps(message)
                 try:
@@ -1003,11 +1118,11 @@ async def send_chat_message(message=None,wrt=None,path=None):
                     except:
                         pass
                     res["status"] = "pain"
-                    if path:
-                        json.dump(message, open(path, "w"))
-                    else:
-                        id = message.get("idd", message.get("sender"))
-                        json.dump(message, open("offline/" + id + ".json", "w"))
+                    # if path:
+                    #     json.dump(message, open(path, "w"))
+                    # else:
+                    #     id = message.get("idd", message.get("sender"))
+                    #     json.dump(message, open("offline/" + id + ".json", "w"))
                     asyncio.create_task(connector())
     except Exception as e:
         print("DELETE THIS MESSAGE FROM Temp/: ", traceback.format_exc())

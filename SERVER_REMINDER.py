@@ -32,7 +32,7 @@ for history_file in ["DAY.json", "MONTH.json", "SYEAR.json","WYEAR.json"]:
 # Load data
 def load_data(file: str, default: Dict) -> Dict:
     try:
-        return json.load(pickle.load(open(file, "rb")))
+        return pickle.load(open(file, "rb"))
     except:
         return default
 
@@ -41,7 +41,9 @@ locations = load_data("locations", {})
 temporary = load_data("temporary", {})
 confirmed = load_data("confirmed", {})
 SAVE = load_data("SAVE", {})
-TOUS_PGS = [] if not os.path.isfile("TOUS_PGS") else pickle.load(open("TOUS_PGS","rb"))
+TOUS = [] if not os.path.isfile("TOUS") else pickle.load(open("TOUS","rb"))
+
+
 
 HOST = "0.0.0.0"
 PORT = 8080
@@ -117,7 +119,6 @@ def instancer(key,path,adress,receipient):
         print("got something there")
     if goten < 3 :
         search_word_in_files("ACCOUNTS_CHATS/"+adress[0], key,receipient) #  pay
-
 
 async def histO(data):
     # "path":[time.strftime("%Y"),time.strftime("%B"),time.strftime("%d"),time.strftime("%H:%M:%S")]
@@ -286,7 +287,7 @@ async def NEW_CL(M):
     data["com_erea"] = cmer
 
     pickle.dump(data, open("DATA/analysis", "wb"))
-    data["recipients"] = TOUS_PGS
+    data["recipients"] = TOUS
     data["action"] = "Activity"
 
     await TRANSACTION(data)
@@ -306,10 +307,11 @@ async def NEW_CL(M):
     # {"cl_N":0,"men":0,"women":0,"older":[],"younger":[],"high_dep":[],"low_dep":[],"high_actv":[],"low_actv":[],"com_erea":""}
     # pickle.dump(data, open("DATA/analysis", "wb"))
     # data=pickle.load(open("DATA/analysis","rb"))
-    # data["recipients"]=TOUS_PGS
+    # data["recipients"]=TOUS
     # data["action"]="Activity"
 
 async def keep(M):
+    return
     # print("in keep() ",M)
     if "str" in str(type(M)):
         if len(M) < 2:
@@ -341,7 +343,7 @@ async def keep(M):
                     temporary[rec].append([connected_clients[rec], json.dumps(M)])
 
 async def Store(M):
-    print("Store(): ",M)
+    print("____"*1000,M)
 
     if M.get("data",0):
         if not os.path.exists("Temp_Emerg/"):
@@ -350,11 +352,12 @@ async def Store(M):
         else:
             json.dump(M, open("Temp_Emerg/" + M["data"].get("sidd", 0) + ".json", "w"))
 
-        if connected_clients.get(M["data"]["idd"],0):
+        if connected_clients.get(M["recipients"][0],0):
             sms=json.dumps(M)
-            Writer=connected_clients[M["data"]["idd"]]
+            Writer=connected_clients[M["recipients"][0]]
             Writer.write(sms.encode())
             await Writer.drain()
+            print(M["data"]["sidd"] , "is sent1")
     else:
         if not os.path.exists("Temp_Emerg/"):
             os.makedirs("Temp_Emerg/")
@@ -362,11 +365,12 @@ async def Store(M):
         else:
             json.dump(M, open("Temp_Emerg/" + M.get("sidd", 0) + ".json", "w"))
 
-        if connected_clients.get(M["idd"], 0):
+        if connected_clients.get(M["recipients"][0], 0):
             sms = json.dumps(M)
-            Writer = connected_clients[M["idd"]]
+            Writer = connected_clients[M["recipients"][0]]
             Writer.write(sms.encode())
             await Writer.drain()
+            print(M["sidd"], "is sent2")
 
 async def NEW_ALR(M):
     print(M)
@@ -394,7 +398,7 @@ async def TOKEN(M):
                     dic["who receive same reminder"].append(M["name"])
 
                 # rec=dic.get("recipients",[])
-                rec=TOUS_PGS
+                rec=TOUS
                 if not M["idd"] in rec :
                     rec.append(M["idd"])
                 data = {"recipients":rec,"idd":dic["idd"],"action":"New Alarm","action2":"token","data":dic}
@@ -441,6 +445,8 @@ async def Received2(key):
     if os.path.isfile("Temp_Emerg/"+key+".json"):
         os.remove("Temp_Emerg/"+key+".json")
         print("Message ",key," deleted")
+    else:
+        print("THIS FILE DOES NOT EXIT: ",key+".json")
 
 async def received(key):
     for idd in offline_messages.keys():
@@ -560,7 +566,7 @@ async def TRANSACTION(M):  #  THE RECEIPT WON'T PRINT IF THE SERVER HASN'T STORE
             print(d["Name"], "disabled")
             del d
 
-        k["recipients"]=TOUS_PGS
+        k["recipients"]=TOUS
         await keep(k)
         await histO(k)
 
@@ -594,7 +600,7 @@ async def TRANSACTION(M):  #  THE RECEIPT WON'T PRINT IF THE SERVER HASN'T STORE
     data["low_actv"]=lw_act
 
     pickle.dump(data, open("DATA/analysis", "wb"))
-    data["recipients"]=TOUS_PGS
+    data["recipients"]=TOUS
     data["action"]="Activity"
     await keep(data)
     del data
@@ -643,7 +649,7 @@ async def N_USER(M):
     MOVE DATA FROM WORLD/EVERYWHERE  TO ME[ADRESS]
     """
     if not os.path.exists("ACCOUNTS_CHATS/"+M["data"]["adress"][0]):     #  "ACCOUNTS/"+M["idd"]+"Items"
-        os.mkdir("ACCOUNTS_CHATS/"+M["data"]["adress"][0])
+        os.makedirs("ACCOUNTS_CHATS/"+M["data"]["adress"][0])
 
     if not os.path.exists("ACCOUNTS_CHATS/"+M["data"]["adress"][0]):     #  "ACCOUNTS/"+M["idd"]+"Items"
         os.mkdir("ACCOUNTS_CHATS/"+M["data"]["adress"][0])
@@ -684,104 +690,233 @@ async def B_U(M):
         shop["BUSY"]=BS
         shop["pht"]=PHT
         json.dump(shop,open("ACCOUNTS/"+M["data"]["idd"]+"/"+M["data"]["idd"][:8]+".json", "w"))
+
+        if not os.path.exists("ACCOUNTS_CHATS/" + M["data"]["zone"][0] + "/" + M["data"]["schm"]):  # zone[0] =N       zone:Ntungamo            #  "/"+M["data"]["zone"][1]+
+            os.makedirs("ACCOUNTS_CHATS/" + M["data"]["zone"][0] + "/" + M["data"]["schm"].replace(".bin", "").replace(".json",
+                                                                                                               ""))  # "/"+M["data"]["zone"][1] +
+        json.dump(M["data"], open("ACCOUNTS_CHATS/" + M["data"]["zone"][0] + "/" + M["data"]["schm"].replace(".bin", "").replace(".json", "") + ".json","w"))
+
         del shop
         del BS
         del PHT
     except:
         json.dump(M["data"], open("ACCOUNTS/"+M["data"]["idd"]+"/"+M["data"]["idd"][:8]+".json", "w"))
     if len( M["data"]["BUSY"])<=3:
-        zone = await _files(dir="ACCOUNTS/" + M["data"]["zone"][0] + "/" + M["data"]["zone"][1])
+        zone = await _files(dir="COUNTRIES/" + M["data"]["zone"][0] + "/" + M["data"]["zone"][1])
         for idd in zone:  # if M[recipients]=zone        the message will be 32MB  to 1000,000 users
             M["recipients"] = [idd.replace(".json", "").replace(".bin", "")]
             await Store(M)
 
-async def ACTIVITY(M):
-    # REGESTER ZONE RECEPIENT IN ITS OWN FOLDER, THUS FOR TALENTS AND SERVICES
-    "THE SERVER KEEPS BUSINESS ONLY, NOT CHATS"
-    # print("THE SERVER KEEPS BUSINESS ONLY, NOT CHATS",M)
-    if M["action"] in ["inbx","cht"]:
-        await Store(M)
-        if not os.path.exists("ACCOUNTS_CHATS/"+M["data"]["zone"][0] +"/" + M["data"]["schm"] ):    #zone[0] =N       zone:Ntungamo            #  "/"+M["data"]["zone"][1]+
-            os.makedirs("ACCOUNTS_CHATS/"+M["data"]["zone"][0] + "/" + M["data"]["schm"].replace(".bin","").replace(".json","")  )   # "/"+M["data"]["zone"][1] +
-        json.dump(M["data"], open("ACCOUNTS_CHATS/"+M["data"]["zone"][0] + "/" + M["data"]["schm"].replace(".bin","").replace(".json","") + ".json", "w"))
-
-    elif M["action"]== "zone" :
-        if M["data"].get("tg",0) :
-            if not os.path.exists("ACCOUNTS_CHATS/"+M["data"]["zone"][0] + "/" + M["data"]["schm"] ):      #zone[0] =N       zone:Ntungamo
-                os.makedirs("ACCOUNTS_CHATS/"+M["data"]["zone"][0] + "/" + M["data"]["schm"])
-            zone = await _files(dir="TALENTS/" + M["data"]["zone"][0] + "/" + M["data"]["zone"][1]+"/"+ M["data"]["tg"] )
-            for idd in zone:  # if M[recipients]=zone        the message will be 32MB  to 1000,000 users
-                M["recipients"] = [idd.replace(".json", "").replace(".bin", "")]
-                await Store(M)
-        else:
-            if not os.path.exists("ACCOUNTS_CHATS/"+M["data"]["zone"][0] + "/" + M["data"]["schm"] ):      #zone[0] =N       zone:Ntungamo
-                os.makedirs("ACCOUNTS_CHATS/"+M["data"]["zone"][0] + "/" + M["data"]["schm"])
-            json.dump(M["data"], open("ACCOUNTS_CHATS/"+M["data"]["zone"][0] + "/" + M["data"]["schm"] + ".json", "w"))
-
-            zone=await _files(dir="COUNTRIES/"+M["data"]["zone"][0] + "/" + M["data"]["zone"][1])
-            for idd in zone:                          #  if M[recipients]=zone        the message will be 32MB  to 1000,000 users
-                M["recipients"]=[idd.replace(".json","").replace(".bin","")]
-                await Store(M)
-
-    elif M["action"] == "next":
-        print("next: ",M)
-        if not os.path.isfile("ACCOUNTS_CHATS/"+M["data"]["idd"]+"/history.json"):
-            json.dump({"ACCOUNTS_CHATS/"+M["data"]["zone"][0] +"/" + M["data"]["schm"]:[]},open("ACCOUNTS/"+M["data"]["idd"]+"/history.json","w") )
-
-        his=json.load(open("ACCOUNTS/"+M["data"]["idd"]+"/history.json","r"))
-        if not his.get("ACCOUNTS_CHATS/"+M["data"]["zone"][0] +"/" + M["data"]["schm"],[]):
-            his["ACCOUNTS_CHATS/"+M["data"]["zone"][0] +"/" + M["data"]["schm"]]=[]
-
-        fls= await _files("ACCOUNTS_CHATS/"+M["data"]["zone"][0] +"/" + M["data"]["schm"])
-        for i in his["ACCOUNTS_CHATS/"+M["data"]["zone"][0] +"/" + M["data"]["schm"]]:
-            try:
-                fls.remove(i)                                                                           #   his["ACCOUNTS/" + M["data"]["zone"][0] + "/" + M["data"]["schm"]]
-            except:
-                pass                                                                                   # fls.remove(i for i in his["ACCOUNTS/"+M["data"]["zone"][0] +"/" + M["data"]["schm"]])
-
-
-        try:   #       the list might be empty
-            rest=fls[0].replace(".json","")+".json"
+async def Filt(fls,his):
+    print("fls:", fls, " his: ", his)
+    fls=[x for x in fls if ".json" in x]
+    for i in fls:  # his["ACCOUNTS_CHATS/"+M["data"]["zone"][0] +"/" + M["data"]["schm"]]:
+        try:
+            if i in his :
+                fls.remove(i)  # his["ACCOUNTS/" + M["data"]["zone"][0] + "/" + M["data"]["schm"]]
         except:
-            rest=""
+            pass  # fls.remove(i for i in his["ACCOUNTS/"+M["data"]["zone"][0] +"/" + M["data"]["schm"]])
 
-        his["ACCOUNTS_CHATS/"+M["data"]["zone"][0] +"/" +M["data"]["schm"]].append(rest)
-        json.dump(his, open("ACCOUNTS/" + M["data"]["idd"] + "/history.json", "w"))
+    try:  # the list might be empty
+        rest = fls[0].replace(".json", "") + ".json"
+    except:
+        rest = ""
+    print("fls:",fls," his: ",his)
+    return rest
 
-        try:  #  IN CASE THE FOLDER IS EMPTY,  THE JSON.LOAD WILL CRASH
-            file=json.load(open("ACCOUNTS_CHATS/"+M["data"]["zone"][0] +"/" + M["data"]["schm"]+"/"+rest,"r"))
-
-            file["schm"]=M["data"]["schm"]+"/"+rest
-            M["deliver"]=file["sidd"]
-            M["data"]=file
+async def ACTIVITY(M):
+    # print(M["data"]["schm"])
+    try:
+        if M["action"] in ["inbx","cht"]:
             await Store(M)
-        except Exception as e :
-            print(">>>>>>>>> ",e)
-            pass
+            if not os.path.exists("ACCOUNTS_CHATS/"+M["data"]["zone"][0] +"/" + M["data"]["schm"] ):    #zone[0] =N       zone:Ntungamo            #  "/"+M["data"]["zone"][1]+
+                os.makedirs("ACCOUNTS_CHATS/"+M["data"]["zone"][0] + "/" + M["data"]["schm"].replace(".bin","").replace(".json","")  )   # "/"+M["data"]["zone"][1] +
+            json.dump(M["data"], open("ACCOUNTS_CHATS/"+M["data"]["zone"][0] + "/" + M["data"]["schm"].replace(".bin","").replace(".json","") + ".json", "w"))
 
-    elif M["action"] == "contact":
-        contact=json.load(open("ACCOUNTS/"+M["idd"]+"/"+M["idd"][:8]+".json","r"))
-        B_U=json.load(open("ACCOUNTS/"+M["idd"]+"/"+M["idd"][:8]+".json","r"))
-        M["contact"]=B_U
-        await Store(M)
-        del B_U
+        elif M["action"]== "zone" :
+            if M["data"].get("tg",0) :
+                print("tg ",M)
+                if not os.path.exists("ACCOUNTS_CHATS/"+M["data"]["zone"][0] + "/" + M["data"]["schm"] ):      #zone[0] =N       zone:Ntungamo
+                    os.makedirs("ACCOUNTS_CHATS/"+M["data"]["zone"][0] + "/" + M["data"]["schm"])
+                zone = await _files(dir="TALENTS/" + M["data"]["zone"][0] + "/" + M["data"]["zone"][1]+"/"+ M["data"]["tg"] )
+                for idd in zone:  # if M[recipients]=zone        the message will be 32MB  to 1000,000 users
+                    M["recipients"] = [idd.replace(".json", "").replace(".bin", "")]
+                    await Store(M)
+            else:
+                if not os.path.exists("ACCOUNTS_CHATS/"+M["data"]["zone"][0] + "/" + M["data"]["schm"] ):      #zone[0] =N       zone:Ntungamo
+                    os.makedirs("ACCOUNTS_CHATS/"+M["data"]["zone"][0] + "/" + M["data"]["schm"])
+                json.dump(M["data"], open("ACCOUNTS_CHATS/"+M["data"]["zone"][0] + "/" + M["data"]["schm"] + ".json", "w"))
 
-    elif M["action"] == "JB":
+                zone=await _files(dir="COUNTRIES/"+M["data"]["zone"][0] + "/" + M["data"]["zone"][1])
+                for idd in zone:                          #  if M[recipients]=zone        the message will be 32MB  to 1000,000 users
+                    M["recipients"]=[idd.replace(".json","").replace(".bin","")]
+                    print("zone: ",M)#
+                    await Store(M)
 
-        if not os.path.exists("TALENTS/"+M["data"]["zn"][0]+"/"+M["data"]["zn"][1]):
-            os.makedirs("TALENTS/"+M["data"]["zn"][0]+"/"+M["data"]["zn"][1])
+        elif M["action"] == "next":
+            print("next: ",M)
+            if not os.path.isfile("ACCOUNTS/"+M["data"]["idd"]+"/history.json"):
+                json.dump({"ACCOUNTS_CHATS/"+M["data"]["zone"][0] +"/" + M["data"]["schm"]:[]},open("ACCOUNTS/"+M["data"]["idd"]+"/history.json","w") )
 
-        for tl in M["data"]["jb"]:
-            if not os.path.exists("TALENTS/" + M["data"]["zn"][0] + "/" + M["data"]["zn"][1]+"/"+tl):
-                os.makedirs("TALENTS/" + M["data"]["zn"][0] + "/" + M["data"]["zn"][1]+"/"+tl)
+            his=json.load(open("ACCOUNTS/"+M["data"]["idd"]+"/history.json","r"))
+            print("his:", his)
+            if not his.get("ACCOUNTS_CHATS/"+M["data"]["zone"][0] +"/" + M["data"]["schm"],0):
+                his["ACCOUNTS_CHATS/"+M["data"]["zone"][0] +"/" + M["data"]["schm"]]=[]
 
-            if not M["data"]["idd"] in os.listdir("TALENTS/"+M["data"]["zn"][0]+"/"+M["data"]["zn"][1]+"/"+tl):                           #  + M["data"]["idd"]
-                open("TALENTS/"+M["data"]["zn"][0]+"/"+M["data"]["zn"][1]+"/"+tl+"/"+M["data"]["idd"],"w").write(M["data"]["idd"])
+            fls= await _files("ACCOUNTS_CHATS/"+M["data"]["zone"][0] +"/" + M["data"]["schm"])
 
 
-        for tl in M["data"]["old"]:
-            if tl in os.listdir("TALENTS/"+M["data"]["zn"][0]+"/"+M["data"]["zn"][1]+"/"+tl+"/"):                               #  + M["data"]["idd"]
-                os.remove("TALENTS/"+M["data"]["zn"][0]+"/"+M["data"]["zn"][1] +"/"+tl +"/"+M["data"]["idd"])
+            rest=await Filt(fls,his["ACCOUNTS_CHATS/"+M["data"]["zone"][0] +"/" +M["data"]["schm"]])
+            if rest == "":
+                return
+            print("his/////////// ",his)
+            if not rest in his["ACCOUNTS_CHATS/"+M["data"]["zone"][0] +"/" +M["data"]["schm"]] :
+                try:  #  IN CASE THE FOLDER IS EMPTY,  THE JSON.LOAD WILL CRASH
+                    file=json.load(open("ACCOUNTS_CHATS/"+M["data"]["zone"][0] +"/" + M["data"]["schm"].replace(".bin", "").replace(".json", "")+"/"+rest,"r"))
+                    his["ACCOUNTS_CHATS/" + M["data"]["zone"][0] + "/" + M["data"]["schm"].replace(".bin", "").replace(".json", "")].append(rest)
+                    json.dump(his, open("ACCOUNTS/" + M["data"]["idd"] + "/history.json", "w"))
+                    file["schm"]=M["data"]["schm"].replace(".bin", "").replace(".json", "")+"/"+rest
+                    M["deliver"]=file["sidd"]
+                    M["data"]=file
+                    await Store(M)
+
+                except Exception as e :
+                    print(f"ERROR: ==== {e}",traceback.format_exc())
+                    pass
+
+        elif M["action"] == "H_nX":
+            print("H_nX: ",M)
+            if not os.path.isfile("ACCOUNTS_CHATS/"+M["data"]["idd"]+"/history.json"):
+                json.dump({"ACCOUNTS_CHATS/"+M["data"]["zone"][0] +"/" + M["data"]["schm"]:[]},open("ACCOUNTS/"+M["data"]["idd"]+"/history.json","w") )
+
+            his=json.load(open("ACCOUNTS/"+M["data"]["idd"]+"/history.json","r"))
+            if not his.get("ACCOUNTS_CHATS/"+M["data"]["zone"][0] +"/" + M["data"]["schm"],[]):
+                his["ACCOUNTS_CHATS/"+M["data"]["zone"][0] +"/" + M["data"]["schm"]]=[]
+
+            fls= await _files("ACCOUNTS_CHATS/"+M["data"]["zone"][0] +"/" + M["data"]["schm"])
+            for i in his["ACCOUNTS_CHATS/"+M["data"]["zone"][0] +"/" + M["data"]["schm"]]:
+                try:
+                    fls.remove(i)                                                                           #   his["ACCOUNTS/" + M["data"]["zone"][0] + "/" + M["data"]["schm"]]
+                except:
+                    pass                                                                                   # fls.remove(i for i in his["ACCOUNTS/"+M["data"]["zone"][0] +"/" + M["data"]["schm"]])
+
+            try:   #       the list might be empty
+                rest=fls[0].replace(".json","")+".json"
+            except:
+                rest=""
+
+            his["ACCOUNTS_CHATS/"+M["data"]["zone"][0] +"/" +M["data"]["schm"]].append(rest)
+            json.dump(his, open("ACCOUNTS/" + M["data"]["idd"] + "/history.json", "w"))
+
+            try:  #  IN CASE THE FOLDER IS EMPTY,  THE JSON.LOAD WILL CRASH
+                file=json.load(open("ACCOUNTS_CHATS/"+M["data"]["zone"][0] +"/" + M["data"]["schm"]+"/"+rest,"r"))
+
+                file["schm"]=M["data"]["schm"]+"/"+rest
+                M["deliver"]=file["sidd"]
+                M["data"]=file
+                await Store(M)
+            except Exception as e :
+                print(">>>>>>>>> ",e)
+                pass
+
+        elif M["action"] == "contact":
+            contact=json.load(open("ACCOUNTS/"+M["idd"]+"/"+M["idd"][:8]+".json","r"))
+            B_U=json.load(open("ACCOUNTS/"+M["idd"]+"/"+M["idd"][:8]+".json","r"))
+            M["contact"]=B_U
+            await Store(M)
+            del B_U
+
+        elif M["action"] == "JB":
+
+            if not os.path.exists("TALENTS/"+M["data"]["zn"][0]+"/"+M["data"]["zn"][1]):
+                os.makedirs("TALENTS/"+M["data"]["zn"][0]+"/"+M["data"]["zn"][1])
+
+            for tl in M["data"]["jb"]:
+                if not os.path.exists("TALENTS/" + M["data"]["zn"][0] + "/" + M["data"]["zn"][1]+"/"+tl):
+                    os.makedirs("TALENTS/" + M["data"]["zn"][0] + "/" + M["data"]["zn"][1]+"/"+tl)
+
+                if not M["data"]["idd"] in os.listdir("TALENTS/"+M["data"]["zn"][0]+"/"+M["data"]["zn"][1]+"/"+tl):                           #  + M["data"]["idd"]
+                    open("TALENTS/"+M["data"]["zn"][0]+"/"+M["data"]["zn"][1]+"/"+tl+"/"+M["data"]["idd"],"w").write(M["data"]["idd"])
+
+
+            for tl in M["data"]["old"]:
+                if tl in os.listdir("TALENTS/"+M["data"]["zn"][0]+"/"+M["data"]["zn"][1]+"/"+tl+"/"):                               #  + M["data"]["idd"]
+                    os.remove("TALENTS/"+M["data"]["zn"][0]+"/"+M["data"]["zn"][1] +"/"+tl +"/"+M["data"]["idd"])
+
+        elif M["action"] == "lk":
+            if not os.path.isdir("ACCOUNTS/"+M["data"]["idd"]+"/likes"):
+                os.mkdir("ACCOUNTS/" + M["data"]["idd"] + "/likes")
+            if M["data"]["idd"] in await _files("ACCOUNTS/"+M["data"]["idd"]+"/likes"):
+                os.remove("ACCOUNTS/"+M["data"]["idd"]+"/likes/"+M["data"]["idd"])
+                dicti = json.load(open("ACCOUNTS/" + M["data"]["idd"] + "/" + M["data"]["idd"]+".json", "r"))
+                lks = int(dicti.get("lk", "0")) - 1
+                dicti["lk"] = lks
+                json.dump(dicti, open("ACCOUNTS/" + M["data"]["idd"] + "/" + M["data"]["idd"]+".json", "w"))
+            else:
+                open("ACCOUNTS/"+M["data"]["idd"]+"/likes/"+M["data"]["idd"],"w").write(M["data"]["idd"])
+                dicti=json.load(open("ACCOUNTS/"+M["data"]["idd"]+"/"+M["data"]["idd"]+".json", "r"))
+                lks=int(   dicti.get("lk","0")   ) +1
+                dicti["lk"]=lks
+                json.dump(dicti,open("ACCOUNTS/" + M["data"]["idd"] + "/" + M["data"]["idd"]+".json", "w"))
+
+            try:
+                rson = json.load(open( "ACCOUNTS_CHATS/" + M["data"]["zone"][0] + "/" + M["data"]["schm"].replace(".bin", "").replace(".json", "") + ".json","r"))
+                lkcs = int(rson.get("lk", "0")) + int(M["data"]["N"])
+                rson["lk"] = str(lkcs)
+                json.dump(rson, open( "ACCOUNTS_CHATS/" + M["data"]["zone"][0] + "/" + M["data"]["schm"].replace(".bin", "").replace(".json", "") + ".json","w"))
+            except:
+                rson = json.load(open("ACCOUNTS_CHATS/" + M["data"]["zone"][0] + "/Activities/" + M["data"]["schm"].replace(".bin", "").replace(".json", "") + ".json", "r"))
+                lkcs = int(rson.get("lk", "0")) + int(M["data"]["N"])
+                rson["lk"] = str(lkcs)
+                json.dump(rson, open( "ACCOUNTS_CHATS/" + M["data"]["zone"][0] + "/Activities/" + M["data"]["schm"].replace(".bin", "").replace( ".json", "") + ".json", "w"))
+
+            rson = json.load(open("ACCOUNTS/" + M["data"]["idd"] + "/" + M["data"]["idd"][:8] + ".json", "r"))
+            lkcs = int(rson.get("lk", "0")) + int(M["data"]["N"])
+            rson["lk"] = str(lkcs)
+            json.dump(rson, open("ACCOUNTS/" + M["data"]["idd"] + "/" + M["data"]["idd"][:8] + ".json", "w"))
+
+            del dicti
+            del lks
+            del lkcs
+            del M
+
+        elif M["action"] == "bl":
+            if not os.path.isdir("ACCOUNTS/" + M["data"]["idd"] + "/blk"):
+                os.mkdir("ACCOUNTS/" + M["data"]["idd"] + "/blk")
+            if M["data"]["idd"] in await _files("ACCOUNTS/" + M["data"]["idd"] + "/blk"):
+                os.remove("ACCOUNTS/" + M["data"]["idd"] + "/blk/" + M["data"]["idd"])
+                dicti = json.load(open("ACCOUNTS/" + M["data"]["idd"] + "/" + M["data"]["idd"]+".json", "r"))
+                bls = int(dicti.get("bl", "0")) - 1
+                dicti["bl"] = bls
+                json.dump(dicti, open("ACCOUNTS/" + M["data"]["idd"] + "/" + M["data"]["idd"]+".json", "w"))
+
+            else:
+                open("ACCOUNTS/" + M["data"]["idd"] + "/blk/" + M["data"]["idd"], "w").write(M["data"]["idd"])
+                dicti = json.load(open("ACCOUNTS/" + M["data"]["idd"] + "/" + M["data"]["idd"]+".json", "r"))
+                bls = int(dicti.get("bl", "0")) + 1
+                dicti["bl"] = bls
+                json.dump(dicti, open("ACCOUNTS/" + M["data"]["idd"] + "/" + M["data"]["idd"]+".json", "w"))
+            try:
+                rson = json.load(open( "ACCOUNTS_CHATS/" + M["data"]["zone"][0] + "/" + M["data"]["schm"].replace(".bin", "").replace(".json", "") + ".json", "r"))
+                blcs = int(rson.get("bl", "0")) + int(M["data"]["N"])
+                rson["bl"] = str(blcs)
+                json.dump(rson, open("ACCOUNTS_CHATS/" + M["data"]["zone"][0] + "/" + M["data"]["schm"].replace(".bin", "").replace(".json", "") + ".json","w"))
+            except Exception as e :
+                rson = json.load(open("ACCOUNTS_CHATS/" + M["data"]["zone"][0] + "/Activities/" + M["data"]["schm"].replace(".bin", "").replace( ".json", "") + ".json", "r"))
+                blcs = int(rson.get("bl", "0")) + int(M["data"]["N"])
+                rson["bl"] = str(blcs)
+                json.dump(rson, open("ACCOUNTS_CHATS/" + M["data"]["zone"][0] + "/Activities/" + M["data"]["schm"].replace(".bin", "").replace( ".json", "") + ".json", "w"))
+
+            rson = json.load(open("ACCOUNTS/" + M["data"]["idd"] + "/" + M["data"]["idd"][:8] + ".json", "r"))
+            blcs = int(rson.get("bl", "0")) + int(M["data"]["N"])
+            rson["bl"] = str(blcs)
+            json.dump(rson, open("ACCOUNTS/" + M["data"]["idd"] + "/" + M["data"]["idd"][:8] + ".json", "w"))
+
+            del dicti
+            del bls
+            del M
+    except Exception as e :
+        print(f"ER >>>> {e}",traceback.format_exc())
 
 async def _files(dir,rev=True):
         FILES = [f.name for f in pathlib.Path(dir).iterdir()]
@@ -798,6 +933,85 @@ async def LK(M,writer):
     ACC=await _files("TALENTS/"+M["data"]["ad"][0]+"/"+M["data"]["ad"][1])
     threading.Thread(target=IN,args=(M["data"]["kw"],ACC,M["data"]["ad"],M["recipients"]) ).start()
 
+async def search_in_json(file_path, target_word):
+    with open(file_path, 'r') as file:
+        parser = ijson.parse(file)  # Incremental JSON parsing to save memory
+        for prefix, event, value in parser:
+            if isinstance(value, str) and target_word in value:
+                pass
+
+async def LOOKING_FOR(CM):
+    OFFER_NEED = load_data("OFFER_NEED", {"LOOKING_FOR": {}, "OFFERING": {}})
+    SENT=[]
+    for jb in CM['data']["receiver"] :
+        recipients= await _files("TALENTS/"+CM['data']["zone"][0]+"/"+ CM['data']["zone"][1]+"/"+jb)
+        for rc in recipients :
+            NCM=CM
+            NCM["recipients"] =[rc]
+            sidd=str(uuid.uuid4())[:8].replace("_", "").replace("-", "")  #  0784606767
+            NCM["data"]["sidd"]=sidd
+            NCM["deliver"] = sidd
+            NCM["data"]["deliver"]=sidd
+            # json.dump(CM, open("Temp_Emerg/" + sidd + ".json", "w"))
+            if not rc in SENT:
+                await Store(NCM)
+                SENT.append(rc)
+
+    jlist=CM["data"]["txt"].split()
+    for jb in jlist:
+        if OFFER_NEED["OFFERING"].get(jb.lower().strip() ,0):
+            for rc in OFFER_NEED["OFFERING"][jb.lower().strip()]:
+                NCM = CM
+                NCM["recipients"] = [rc]
+                sidd = str(uuid.uuid4())[:8].replace("_", "").replace("-", "")  # 0784606767
+                NCM["data"]["sidd"] = sidd
+                NCM["deliver"] = sidd
+                NCM["data"]["deliver"] = sidd
+                # json.dump(CM, open("Temp_Emerg/" + sidd + ".json", "w"))
+                if not rc in SENT:
+                    await Store(NCM)
+                    SENT.append(rc)
+
+            OFFER_NEED["OFFERING"][jb.lower().strip()].append(CM["data"]["idd"])
+        else:
+            OFFER_NEED["OFFERING"][jb.lower().strip()]=[]
+            OFFER_NEED["OFFERING"][jb.lower().strip()].append(CM["data"]["idd"])
+    pickle.dump(OFFER_NEED, open('OFFER_NEED', "wb"))
+    del SENT
+
+async def OFFERING(CM):
+    OFFER_NEED = load_data("OFFER_NEED", {"LOOKING_FOR":{},"OFFERING":{}})
+    SENT=[]
+    for jb in CM['data']["receiver"] :
+        recipients= await _files("TALENTS/"+CM['data']["zone"][0]+"/"+ CM['data']["zone"][1]+"/"+jb)
+        for rc in recipients :
+            NCM = CM
+            NCM["recipients"] = [rc]
+            sidd = str(uuid.uuid4())[:8].replace("_", "").replace("-", "")  # 0784606767
+            NCM["data"]["sidd"] = sidd
+            NCM["deliver"] = sidd
+            if not rc in SENT:
+                await Store(NCM)
+                SENT.append(rc)
+
+    jlist=CM["data"]["txt"].split()
+    for jb in jlist:
+        if OFFER_NEED["LOOKING_FOR"].get(jb.lower().strip() ,0):
+            for rc in OFFER_NEED["LOOKING_FOR"][jb.lower().strip()]:
+                NCM = CM
+                NCM["recipients"] = [rc]
+                sidd = str(uuid.uuid4())[:8].replace("_", "").replace("-", "")  # 0784606767
+                NCM["data"]["sidd"] = sidd
+                NCM["deliver"] = sidd
+                if not rc in SENT:
+                    await Store(NCM)
+                    SENT.append(rc)
+            OFFER_NEED["LOOKING_FOR"][jb.lower().strip()].append(CM["data"]["idd"])
+        else:
+            OFFER_NEED["LOOKING_FOR"][jb.lower().strip()] = []
+            OFFER_NEED["LOOKING_FOR"][jb.lower().strip()].append(CM["data"]["idd"])
+    pickle.dump(OFFER_NEED, open('OFFER_NEED', "wb"))
+    del SENT
 # vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 
 async def handle_client_connection(reader: StreamReader, writer: StreamWriter):
@@ -807,7 +1021,7 @@ async def handle_client_connection(reader: StreamReader, writer: StreamWriter):
         data = await reader.read(1024)
         All = json.loads(data.decode())
     except json.JSONDecodeError as e:
-        print("Error is : ",e)
+        print("Error is : ",traceback.format_exc())
         writer.close()
         await writer.wait_closed()
         return
@@ -816,8 +1030,8 @@ async def handle_client_connection(reader: StreamReader, writer: StreamWriter):
         pass
 
     client_name = All["sender"]
-    if not client_name in TOUS_PGS:
-        TOUS_PGS.append(client_name)
+    if not client_name in TOUS:
+        TOUS.append(client_name)
     connected_clients[client_name] = writer
 
     print('WELCOME:   ',client_name)
@@ -839,28 +1053,24 @@ async def handle_client_connection(reader: StreamReader, writer: StreamWriter):
                 except:
                     M={}
 
-
-
                 if M.get("action", 0) == "Received":
                     print("Received: ",M)
                     await Received2(M["deliver"])
-                    await received(M["deliver"])
+                    # await received(M["deliver"])
                     M={}
 
                 try:
-                    # print("GOT: ",M)
                     s=M.get("sidd",None )
                     if s :
                         delivery={"_F_":s+".json"}
                         writer.write(json.dumps(delivery).encode("utf-8"))
-                        # print("delivery1: ",delivery)
                         await writer.drain()
                     else:
                         s = M.get("data", None)
                         if s:
                             delivery = {"_F_": M["data"].get("sidd", "")+".json"}
                             writer.write(json.dumps(delivery).encode("utf-8"))
-                            # print("delivery2: ", delivery)
+                            print("delivery2: ", delivery)
                             await writer.drain()
                 except Exception as e :
                     print("Delivery: ",e)
@@ -892,15 +1102,21 @@ async def handle_client_connection(reader: StreamReader, writer: StreamWriter):
                     await N_USER(M)                                                            ##
                     M = {}
                                                                                                ##
-                elif M.get("action", 0) in ["inbx", "cht", "zone",'next',"next","contact","JB"] :
-                    print("next",M)
+                elif M.get("action", 0) in ["inbx", "cht", "zone",'next',"next","contact","JB","lk","bl"] :
                     await ACTIVITY(M)                                                          ##
-                                                                                               ##
-
+                                                                                               #
                     M={}
 
                 elif M.get("action", 0) == "LK":
                     await LK(M, writer)
+
+                elif M.get("action", 0) == "LOOKING_FOR":  #LOOKING_FOR    OFFERING
+                    await LOOKING_FOR(M)
+                elif M.get("action", 0) == "OFFERING":  #  "GVM"
+                    await OFFERING(M)
+
+                elif M.get("action", 0) == "GVM":  #  "GVM"
+                    await Store(M)
                 #################################################################################
                 elif M.get("action", 0) == "New_client":
                     await NEW_CL(M)
@@ -931,10 +1147,10 @@ async def handle_client_connection(reader: StreamReader, writer: StreamWriter):
 
                 elif M.get("action",0) == "one":
                     await ONE(M, writer)
-                else:
+                # else:
                     # print("M",M)
-                    if len(M) > 0 :
-                        await keep(M)
+                    # if len(M) > 0 :
+                    #     await keep(M)
 
                 rec = M.get("recipients", [])
                 for r in rec:
@@ -988,7 +1204,6 @@ async def send_chat_message(recipient: str, message: str):
 
 async def SENDER():
     sent=[]
-
     while True:
         try:
             files= await _files("Temp_Emerg/")
@@ -996,14 +1211,17 @@ async def SENDER():
                 dct = json.load(open("Temp_Emerg/"+x, "r"))
                 if not x in sent :
                     if dct["recipients"][0] in connected_clients:
-                        sent.append(x)
                         writer=connected_clients[dct["recipients"][0]]
                         writer.write(json.dumps(dct).encode())
                         await writer.drain()
-
-                        print(">>>>>>>>>>>>>> ",sent)
-
-
+                        sent.append(x)
+                        print("*** ",sent,"   x:  ",x)
+                        del dct
+                        del writer
+                        x=None
+                else:
+                    os.remove("Temp_Emerg/"+x)
+            files=[]
         except Exception as e:
             print("A MESSAGE WAS NOT SENT: ",e)
         sent=[]
@@ -1066,15 +1284,15 @@ async def Cleaner2():
 
 async def cleaner():
     global  WRITER
-    # breath = {"M":"online","recipients":TOUS_PGS}
+    # breath = {"M":"online","recipients":TOUS}
     try:
         while True:
             if 'WRITER' in globals() and len(connected_clients)>0 :
-                for cl in TOUS_PGS :
+                for cl in TOUS :
                     try:
                         breath = {"M": "ol", "tm":time.strftime("%d %B %Y %H:%M:%S"),"recipients": [cl]}
-                        WRITER.write(json.dumps(breath).encode())
-                        await WRITER.drain()
+                        # WRITER.write(json.dumps(breath).encode())
+                        # await WRITER.drain()
                     except Exception as e:
                         print("Error in cleaner:", e)
                         if cl in connected_clients:
@@ -1099,12 +1317,13 @@ async def check_status(writer,client):
         return False
 
 async def save():
-    while True:     # TOUS_PGS
+    while True:     # TOUS
         pickle.dump(offline_messages, open('offline_messages', "wb"))
         pickle.dump(locations, open('locations', "wb"))
         pickle.dump(confirmed, open('confirmed', "wb"))
         pickle.dump(confirmed, open('save', "wb"))
-        pickle.dump(TOUS_PGS, open('TOUS_PGS', "wb"))
+        pickle.dump(TOUS, open('TOUS', "wb"))          #{"LOOKING_FOR":{},"OFFERING":{}}
+
         await asyncio.sleep(1)
 
 async def main():
@@ -1112,7 +1331,7 @@ async def main():
     print(f'Server running on http://{HOST}:{PORT}')
     threading.Thread(target=ftp).start()
     async with server:
-        await asyncio.gather(server.serve_forever(),save(), SENDER(), forgoten(),cleaner() )                            #cleaner(),
+        await asyncio.gather(server.serve_forever(),SENDER(), save(), forgoten(),cleaner() )             #  SENDER(),              #cleaner(),
 
 
 

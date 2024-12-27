@@ -75,5 +75,7 @@ Why It Was Needed: Many refugees struggle to find even basic work due to lack of
 **These skills will not only empower them within the settlement but also prepare them to excel outside, keeping them competitive and up-to-date with modern technology.**
 
 Shabani Aime
+
 Lead Developer, Emergency App
+
 Contact: +256 788 835687 | aimeshabani@gmail.com

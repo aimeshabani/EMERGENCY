@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Replace org.libsdl.app with the identifier of your game below, e.g.
+     com.gamemaker.game
+-->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+      android:versionCode="10212"
+      android:versionName="0.2"
+      android:installLocation="auto">
+
+    <supports-screens
+            android:smallScreens="true"
+            android:normalScreens="true"
+            android:largeScreens="true"
+            android:anyDensity="true"
+            
+            android:xlargeScreens="true"
+            
+    />
+
+    <!-- Android 2.3.3 -->
+    <uses-sdk android:minSdkVersion="21" android:targetSdkVersion="33" />
+
+    <!-- OpenGL ES 2.0 -->
+    <uses-feature android:glEsVersion="0x00020000" />
+
+    <!-- Set permissions -->
+    
+        <uses-permission android:name="android.permission.INTERNET" />
+    
+        <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    
+        <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    
+        <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    
+        <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
+    
+        <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    
+        <uses-permission android:name="android.permission.VIBRATE" />
+    
+        <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    
+        <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    
+        <uses-permission android:name="android.permission.MEDIA_BUTTON" />
+    
+        <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    
+        <uses-permission android:name="android.permission.CAMERA" />
+    
+        <uses-permission android:name="android.permission.BLUETOOTH_SCAN" />
+    
+        <uses-permission android:name="android.permission.BLUETOOTH" />
+    
+        <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    
+        <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+    
+        <uses-permission android:name="android.permission.BLUETOOTH_ADVERTISE" />
+    
+
+    
+
+    
+
+    
+
+
+    <!-- Create a Java class extending SDLActivity and place it in a
+         directory under src matching the package, e.g.
+         	src/com/gamemaker/game/MyGame.java
+
+         then replace "SDLActivity" with the name of your class (e.g. "MyGame")
+         in the XML below.
+
+         An example Java class can be found in README-android.txt
+    -->
+    <application android:label="@string/app_name"
+                 android:debuggable="true"
+                 android:icon="@mipmap/icon"
+                 android:allowBackup="true"
+                 
+                 
+                 android:theme="@android:style/Theme.NoTitleBar"
+                 android:hardwareAccelerated="true"
+                 android:requestLegacyExternalStorage="true">
+                 <!--android:extractNativeLibs="true" -->
+        
+
+        
+        <meta-data android:name="android.app.lib_name" android:value="app"/>
+        <meta-data android:name="android.app.bridges" android:value="sdl2"/>
+        <meta-data android:name="android.app.start_path" android:value="main.py"/>
+        <meta-data android:name="wakelock" android:value="0"/>
+
+        <activity android:name="org.kivy.android.PythonActivity"
+                  android:label="@string/app_name"
+                  android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|fontScale|uiMode|uiMode|screenSize|smallestScreenSize|layoutDirection"
+                  
+                  android:exported="true"
+                  
+                  android:launchMode="standard"
+                  
+                  >
+
+            <intent-filter>
+            
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            
+
+            
+            </intent-filter></activity>
+
+        
+
+        
+        
+        <service android:name="org.kivy.emergency.ServiceSos"
+                 android:process=":service_Sos" />
+        
+        
+
+        
+    
+
+		<receiver android:name=".BootCompletedReceiver" android:enabled="true" android:exported="true">
+			<intent-filter>
+				<action android:name="android.intent.action.BOOT_COMPLETED" />
+				<category android:name="android.intent.category.MAIN" />
+			</intent-filter>
+		</receiver>
+    </application>
+
+</manifest>

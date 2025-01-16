@@ -62,21 +62,28 @@ from kivy.uix.widget import Widget
 
 
 if platform == 'android':
-    from jnius import autoclass, cast
+    from jnius import autoclass, java_method, cast    #  PythonJavaClass,
     from android import activity
     from plyer import vibrator
 
-    PythonActivity = autoclass('org.kivy.android.PythonActivity')
-    Camera = autoclass('android.hardware.Camera')
-    SurfaceView = autoclass('android.view.SurfaceView')
-    SurfaceHolder = autoclass('android.view.SurfaceHolder')
-    Surface = autoclass('android.view.Surface')
+    # PythonScanCallback = autoclass('org.kivy.emergency.PythonScanCallback')
+
+    # PythonActivity = autoclass('org.kivy.android.PythonActivity')
+    # Camera = autoclass('android.hardware.Camera')
+    # SurfaceView = autoclass('android.view.SurfaceView')
+    # SurfaceHolder = autoclass('android.view.SurfaceHolder')
+    # Surface = autoclass('android.view.Surface')
 
     from android.permissions import request_permissions, Permission,  check_permission
-    request_permissions([Permission.CAMERA, Permission.ACCESS_FINE_LOCATION, Permission.RECORD_AUDIO, Permission.ACCESS_COARSE_LOCATION, Permission.WRITE_EXTERNAL_STORAGE, Permission.READ_EXTERNAL_STORAGE])
 
     # if not check_permission('android.permission.RECORD_AUDIO'):
-        # request_permissions([Permission.RECORD_AUDIO, Permission.WRITE_EXTERNAL_STORAGE])
+    #     request_permissions([Permission.BLUETOOTH_SCAN, Permission.BLUETOOTH_ADMIN, Permission.BLUETOOTH_CONNECT, Permission.BLUETOOTH])
+
+    request_permissions([ Permission.BLUETOOTH_SCAN, Permission.BLUETOOTH, Permission.BLUETOOTH_ADMIN,
+                         Permission.BLUETOOTH_CONNECT, Permission.BLUETOOTH_ADVERTISE, Permission.CAMERA, Permission.ACCESS_FINE_LOCATION, Permission.RECORD_AUDIO, Permission.ACCESS_COARSE_LOCATION,
+                         Permission.WRITE_EXTERNAL_STORAGE, Permission.READ_EXTERNAL_STORAGE])
+
+    # if not check_permission('android.permission.RECORD_AUDIO'):
 
 
 
@@ -137,6 +144,7 @@ async def ASYNC(msg):
         pass
 
 def send(data):  # This is for sending   client.send_message( b'/ping', [asctime(localtime()).encode('utf8'), ],)
+    print("sending...")
     if not os.path.isfile(dr() + "Temp/" + data.get("sidd", "") + ".json"):
         json.dump(data, open(dr() + "Temp/" + data.get("sidd", "") + ".json", "w"))
 
@@ -145,6 +153,7 @@ def send(data):  # This is for sending   client.send_message( b'/ping', [asctime
     #     client.send_message( b'/To_server', [data.encode('utf8'), ],)
     # else:
     #     asyncio.run(ASYNC(data))
+
 def SEARCH(message):
     global RRR
     dc = json.loads(message.decode('utf8'))
@@ -171,7 +180,6 @@ def RECEIVER(message):  # This receives also  from  bind
             CLASS.zchat(POS=None, ME=MESS)
         if MESS["action"] == "inbx":
             CLASS.PROFILE(iddd=None, update_new=MESS)
-
 
         print("RECEIVER: ",MESS)
 
@@ -236,55 +244,55 @@ def underground(x="0"):   #     0 : start service        1 : close & open App   
             argument = ''
             service.start(mActivity, argument)
 
-class CameraPreview(Widget):
-    def __init__(self, **kwargs):
-        """
-        layout = BoxLayout(orientation='vertical')
-
-        # Create a camera preview widget
-        self.camera_preview = CameraPreview(size_hint=(1, 0.8))
-        layout.add_widget(self.camera_preview.surface_view)
-
-        # Button to capture an image
-        capture_button = Button(text='Capture Image', size_hint=(1, 0.2))
-        capture_button.bind(on_press=self.capture_image)
-        layout.add_widget(capture_button)
-
-        return layout
-
-        :param kwargs:
-        """
-        super(CameraPreview, self).__init__(**kwargs)
-        self.surface_view = SurfaceView(PythonActivity.mActivity)
-        self.holder = self.surface_view.getHolder()
-        self.holder.addCallback(self)
-        self.camera = Camera.open()
-
-    def surfaceChanged(self, holder, format, width, height):
-        self.camera.stopPreview()
-        self.camera.setPreviewDisplay(holder)
-        self.camera.startPreview()
-
-    def surfaceCreated(self, holder):
-        self.camera.setPreviewDisplay(holder)
-        self.camera.startPreview()
-
-    def surfaceDestroyed(self, holder):
-        self.camera.stopPreview()
-        self.camera.release()
-
-    def capture(self):
-        # Implement capturing image from the camera
-        self.camera.takePicture(None, None, self.picture_callback)
-
-    def picture_callback(self, data, camera):
-        # Save the captured image
-        filepath = os.path.join(App.get_running_app().user_data_dir, 'captured_image.jpg')
-        with open(filepath, 'wb') as file:
-            file.write(data)
-        print(f'Image saved to {filepath}')
-        # Restart preview after capture
-        self.camera.startPreview()
+# class CameraPreview(Widget):
+#     def __init__(self, **kwargs):
+#         """
+#         layout = BoxLayout(orientation='vertical')
+#
+#         # Create a camera preview widget
+#         self.camera_preview = CameraPreview(size_hint=(1, 0.8))
+#         layout.add_widget(self.camera_preview.surface_view)
+#
+#         # Button to capture an image
+#         capture_button = Button(text='Capture Image', size_hint=(1, 0.2))
+#         capture_button.bind(on_press=self.capture_image)
+#         layout.add_widget(capture_button)
+#
+#         return layout
+#
+#         :param kwargs:
+#         """
+#         super(CameraPreview, self).__init__(**kwargs)
+#         self.surface_view = SurfaceView(PythonActivity.mActivity)
+#         self.holder = self.surface_view.getHolder()
+#         self.holder.addCallback(self)
+#         self.camera = Camera.open()
+#
+#     def surfaceChanged(self, holder, format, width, height):
+#         self.camera.stopPreview()
+#         self.camera.setPreviewDisplay(holder)
+#         self.camera.startPreview()
+#
+#     def surfaceCreated(self, holder):
+#         self.camera.setPreviewDisplay(holder)
+#         self.camera.startPreview()
+#
+#     def surfaceDestroyed(self, holder):
+#         self.camera.stopPreview()
+#         self.camera.release()
+#
+#     def capture(self):
+#         # Implement capturing image from the camera
+#         self.camera.takePicture(None, None, self.picture_callback)
+#
+#     def picture_callback(self, data, camera):
+#         # Save the captured image
+#         filepath = os.path.join(App.get_running_app().user_data_dir, 'captured_image.jpg')
+#         with open(filepath, 'wb') as file:
+#             file.write(data)
+#         print(f'Image saved to {filepath}')
+#         # Restart preview after capture
+#         self.camera.startPreview()
 
 from kivy.graphics import Ellipse, Color, StencilPush, StencilUse, StencilUnUse, StencilPop, Rectangle
 
@@ -460,6 +468,132 @@ class ExText(TextInput):
         super(ExText,self).__init__(**kwargs)
         self.bind(minimum_height=self.setter('height'))
 
+
+# from jnius import autoclass
+# import logging
+#
+# # Initialize logging
+# logging.basicConfig(level=logging.INFO)
+# logger = logging.getLogger(__name__)
+#
+# # Import Java classes
+# ScanCallback = autoclass('android.bluetooth.le.ScanCallback')
+# BluetoothAdapter = autoclass("android.bluetooth.BluetoothAdapter")
+# ScanSettings = autoclass("android.bluetooth.le.ScanSettings")
+# ScanSettingsBuilder = autoclass("android.bluetooth.le.ScanSettings$Builder")
+# ScanFilter = autoclass("android.bluetooth.le.ScanFilter")
+# ScanFilterBuilder = autoclass("android.bluetooth.le.ScanFilter$Builder")
+#
+# class BLEScanCallback(ScanCallback):
+#     def onScanResult(self, callback_type, result):
+#         """
+#         Called when a BLE device is found.
+#         """
+#         device = result.getDevice()
+#         name = device.getName()
+#         address = device.getAddress()
+#         logger.info(f"Found device: {name} - {address}")
+#
+#     def onBatchScanResults(self, results):
+#         """
+#         Called when batch scan results are available.
+#         """
+#         for result in results:
+#             self.onScanResult(0, result)
+#
+#     def onScanFailed(self, error_code):
+#         """
+#         Called when the scan fails.
+#         """
+#         logger.error(f"Scan failed with error code: {error_code}")
+#
+# class BLEScanner:
+#     def __init__(self):
+#         self.adapter = BluetoothAdapter.getDefaultAdapter()
+#
+#         if self.adapter is None or not self.adapter.isEnabled():
+#             logger.error("Bluetooth is not enabled or available.")
+#             raise RuntimeError("Bluetooth is not enabled or available.")
+#
+#         self.le_scanner = self.adapter.getBluetoothLeScanner()
+#         self.scan_callback = BLEScanCallback()
+#
+#         # Configure ScanSettings
+#         settings_builder = ScanSettingsBuilder()
+#         settings_builder.setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
+#         self.settings = settings_builder.build()
+#
+#         # Configure ScanFilter
+#         filter_builder = ScanFilterBuilder()
+#         self.filter = filter_builder.build()
+#
+#     def start_scanning(self):
+#         if not self.le_scanner:
+#             logger.error("LE Scanner is not initialized.")
+#             return
+#
+#         filters = [self.filter]
+#         try:
+#             self.le_scanner.startScan(filters, self.settings, self.scan_callback)
+#             logger.info("Started scanning...")
+#         except Exception as e:
+#             logger.error(f"Failed to start scanning: {e}")
+#
+#     def stop_scanning(self):
+#         if not self.le_scanner:
+#             logger.error("LE Scanner is not initialized.")
+#             return
+#
+#         try:
+#             self.le_scanner.stopScan(self.scan_callback)
+#             logger.info("Stopped scanning.")
+#         except Exception as e:
+#             logger.error(f"Failed to stop scanning: {e}")
+#
+# class BLEAdvertiser:
+#     def __init__(self, uuid_str="12345678-1234-5678-1234-567812345678", message="I sell electronics"):
+#         self.adapter = BluetoothAdapter.getDefaultAdapter()
+#
+#         if self.adapter is None or not self.adapter.isEnabled():
+#             raise RuntimeError("Bluetooth is not enabled or available.")
+#
+#         self.le_advertiser = self.adapter.getBluetoothLeAdvertiser()
+#
+#         settings_builder = AdvertiseSettingsBuilder()
+#         settings_builder.setAdvertiseMode(AdvertiseSettingsBuilder.ADVERTISE_MODE_LOW_POWER)
+#         settings_builder.setConnectable(True)
+#         settings_builder.setTimeout(0)
+#         settings_builder.setTxPowerLevel(AdvertiseSettingsBuilder.ADVERTISE_TX_POWER_MEDIUM)
+#         self.settings = settings_builder.build()
+#
+#         data_builder = AdvertiseDataBuilder()
+#         uuid = UUID.fromString(uuid_str)
+#         parcel_uuid = ParcelUuid(uuid)
+#
+#         data_builder.addServiceUuid(parcel_uuid)
+#         data_builder.addServiceData(parcel_uuid, message.encode('utf-8'))
+#         self.data = data_builder.build()
+#
+#     def start_advertising(self):
+#         if not self.le_advertiser:
+#             logger.error("LE Advertiser is not initialized.")
+#             return
+#         try:
+#             self.le_advertiser.startAdvertising(self.settings, self.data, None)
+#             logger.info("Started advertising...")
+#         except Exception as e:
+#             logger.error(f"Failed to start advertising: {e}")
+#
+#     def stop_advertising(self):
+#         if not self.le_advertiser:
+#             logger.error("LE Advertiser is not initialized.")
+#             return
+#         try:
+#             self.le_advertiser.stopAdvertising(None)
+#             logger.info("Stopped advertising.")
+#         except Exception as e:
+#             logger.error(f"Failed to stop advertising: {e}")
+
 class RM(Screen):
     def __init__(self,**kwargs):
         super(RM,self).__init__(**kwargs)
@@ -520,6 +654,32 @@ class RM(Screen):
             self.PAIDADDS=IDD[:16]
             self.ORG=IDD[:24]
             json.dump(dic, open("SD/conf/me.json", "w"))
+
+            if not os.path.isdir(dr() + "contacts/" + IDD ):
+                os.mkdir(dr() + "contacts/" + IDD )
+
+            if not os.path.isdir(dr() + "contacts/" + IDD + "/chats/"):
+                os.mkdir(dr() + "contacts/" + IDD + "/chats/")
+
+            if not os.path.isfile(dr() + "contacts/" + IDD + "/" + IDD + ".json"):
+                json.dump({"schm": "Activities/JobTalent/" + IDD, "action": "B_U", "org": self.ME["Name"][0], "msg": "hello",
+                           "zone": self.ME["adress"], "day": time.strftime("%d/%m/%y %H:%M:%S"),
+                           'subject': self.ME["busy"], "BUSY": [], "pht": [], "sidd": IDD[:5], "idd": IDD},
+                          open(dr() + "contacts/" + IDD + "/" + IDD + ".json","w"))
+
+            if not os.path.exists(self.ME["adress"][1] + "/LOOKING FOR"):  # "LOOKING FOR"    "OFFERING"
+                os.makedirs(self.ME["adress"][1] + "/LOOKING FOR")
+                os.makedirs(self.ME["adress"][1] + "/LOOKING FOR" + "/jobs")
+                os.makedirs(self.ME["adress"][1] + "/LOOKING FOR" + "/bagainers")
+                os.makedirs(self.ME["adress"][1] + "/LOOKING FOR" + "/given")
+
+            if not os.path.exists(self.ME["adress"][1] + "/OFFERING"):  # "LOOKING FOR"    "OFFERING"
+                os.makedirs(self.ME["adress"][1] + "/OFFERING")
+                os.makedirs(self.ME["adress"][1] + "/OFFERING" + "/jobs")
+                os.makedirs(self.ME["adress"][1] + "/OFFERING" + "/bagainers")
+                os.makedirs(self.ME["adress"][1] + "/OFFERING" + "/given")
+
+
             Clock.schedule_once(self.new, 0)
             underground(x="0")
             snd={"action":"N_user","data":dic,"sidd": str(uuid.uuid4())[:5]}
@@ -552,9 +712,9 @@ class RM(Screen):
     def IP(self,x, pm=None):
         self.cnt+=1
         print(self.cnt)
-        if self.cnt == 5 :
+        if self.cnt == 45 :
             Clock.schedule_once(self.new, 0)
-        if self.cnt == 10 :
+        if self.cnt == 50 :
             if platform == "android":
                 sz=(.5, .13)
             else:
@@ -570,7 +730,7 @@ class RM(Screen):
             new_popup = Popup(title="Adress :", title_size=Window.size[1] / 50, title_align="center",
                               separator_color=(1, 1, 1, 0), size_hint=sz, content=T, disabled=False)
             new_popup.open()
-        if self.cnt == 15 or pm:
+        if self.cnt == 55 or pm:
             Clock.unschedule(self.IP)
             if platform == "android":
                 sz=(.5, .13)
@@ -622,7 +782,7 @@ class RM(Screen):
             json.dump(d, open("SD/conf/me.json", "w"))
             # w.text=d["idd"]
 
-    def new(self, x):
+    def new(self, x,idd=None):
         def submited( butn):
             global r_n, r_pn, PS, ad1, ad2, ad3, new_popup, g_new, ok
 
@@ -650,17 +810,59 @@ class RM(Screen):
                 cm = cm - 1
 
             if len(w_l) == cm:
-                ID = str(uuid.uuid4()).replace("-", "").replace(" ", "").replace("_", "").replace(":", "").replace("/",
-                                                                                                                   "").lower() + "ONE"
+                if idd:
+                    ID=idd
+                    if self.ME.get("perm",0):
+                        perm=self.ME["perm"]
+
+                    else:
+                        perm=[ID[:8]]
+
+                    lk = self.ME.get("lk", 21)
+                    LIKE = self.ME.get("LIKE", [0, 1])
+                    jb=self.ME.get("jb", None)
+
+                else:
+                    ID=str(uuid.uuid4()).replace("-", "").replace(" ", "").replace("_", "").replace(":", "").replace("/","").lower() + "ONE"
+                    perm = [ID[:8]]
+                    lk=21
+                    LIKE=[0,1]
+                    jb=None
+
+
                 me = {"Name": [r_n.text, r_pn.text], "pseudo": PS.text, "busy": ad3.text,
-                      "adress": [ad1.text, ad2.text], "idd": ID, "perm": [ID[:8]], "LIKE": [0, 1],"lk":21}
+                      "adress": [ad1.text, ad2.text], "idd": ID, "perm": perm, "LIKE": LIKE,"lk":lk}
+                if jb:
+                    me["jb"]=jb
                 self.ME = me
                 self.JOBTALENT = ID[:8]
                 self.PAIDADDS = ID[:16]
                 self.ORG = ID[:24]
+
                 if not os.path.isdir(dr() + "Activities/" + me["adress"][1]):
                     os.mkdir(dr() + "Activities/" + me["adress"][1])
                 json.dump(me, open("SD/conf/me.json", "w"))
+
+                if not idd:
+                    if not os.path.exists(dr() + "contacts/" + ID + "/chats/"):
+                        os.makedirs(dr() + "contacts/" + ID + "/chats/")
+
+                    json.dump({"schm":"Activities/JobTalent/"+ID,"action": "B_U","org":r_n.text,"msg":"hello","zone": [ad1.text, ad2.text],"day": time.strftime("%d/%m/%y %H:%M:%S"),
+                       'subject':ad3.text ,"BUSY":[],"pht":[],"sidd":ID[:5], "idd": ID},
+                              open(dr()+"contacts/"+ID+"/"+ID+".json","w"))
+
+                if not os.path.exists(self.ME["adress"][1] + "/LOOKING FOR"):  # "LOOKING FOR"    "OFFERING"
+                    os.makedirs(self.ME["adress"][1] + "/LOOKING FOR" )
+                    os.makedirs(self.ME["adress"][1] + "/LOOKING FOR"  + "/jobs")
+                    os.makedirs(self.ME["adress"][1] + "/LOOKING FOR" + "/bagainers")
+                    os.makedirs(self.ME["adress"][1] + "/LOOKING FOR"  + "/given")
+
+                if not os.path.exists(self.ME["adress"][1] + "/OFFERING"):  # "LOOKING FOR"    "OFFERING"
+                    os.makedirs(self.ME["adress"][1] + "/OFFERING")
+                    os.makedirs(self.ME["adress"][1] + "/OFFERING" + "/jobs")
+                    os.makedirs(self.ME["adress"][1] + "/OFFERING" + "/bagainers")
+                    os.makedirs(self.ME["adress"][1] + "/OFFERING" + "/given")
+
                 Clock.schedule_once(lambda x: underground(x="3"), 5)
 
                 new_popup.dismiss()
@@ -713,6 +915,7 @@ class RM(Screen):
             ad1.text = olD["adress"][0]
             ad2.text = olD["adress"][1]
             ad3.text = olD["busy"]
+
 
         g_new.add_widget(ad1)
         g_new.add_widget(ad2)
@@ -1139,6 +1342,7 @@ class RM(Screen):
 
         okbt.bind(on_release=lambda w: new_popup.dismiss())
         okbt.bind(on_release=lambda w: Clock.schedule_once(self.home) )
+
 
     def make(self,w):
         if len(self.SLD) > 0 :
@@ -1893,6 +2097,236 @@ class RM(Screen):
             server.bind(b'/RECEIVER', self.RECEIVER)
         except:
             pass
+        self.rn = 0
+
+    #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++   BLUETOOTH
+
+        Clock.schedule_once(self.Bluetooth_receiver, 2)
+        # Clock.schedule_once(self.Bluetooth_expose, 3)
+
+    def Bluetooth_receiver(self, x):
+
+        if platform == "android":
+
+            try:
+
+                import traceback
+                from jnius import autoclass
+
+                def received(sender=None, date=None):
+                    discovered_devices_dir = os.path.join(activity.getFilesDir().getPath(), "service")
+                    HERE = os.listdir(activity.getFilesDir().getPath())
+                    Logger.info(f"HERE: {HERE}")
+
+                    devices = {}
+
+                    if os.path.exists(discovered_devices_dir):
+                        HERE = os.listdir(discovered_devices_dir)
+                        Logger.info(f"IN SERVICE: {HERE}")
+                        for filename in os.listdir(discovered_devices_dir):
+                            Logger.info(f"FILENAME: {filename}")
+                            devices[filename] = eval(open(filename, 'r').read())
+
+                    Logger.info(f"Received data: {devices}")
+                    # return devices
+
+                    discovered_devices_dir = os.path.join(activity.getFilesDir().getPath(), "Received_data")
+                    HERE3 = os.listdir(discovered_devices_dir)
+                    Logger.info(f"Received_data: {HERE3}")
+
+                    devices2 = {}
+
+                    if os.path.exists(discovered_devices_dir):
+                        # HERE2 = os.listdir(discovered_devices_dir)
+                        # Logger.info(f"HERE3: {HERE3}")
+                        for filename3 in os.listdir(discovered_devices_dir):
+                            Logger.info(f"FILENAME: {filename3}")
+                            devices2[filename3] = eval(open(filename3, 'r').read())
+
+                    Logger.info(f"Received data: {devices2}")
+                    # return devices
+
+                BluetoothAdapter = autoclass('android.bluetooth.BluetoothAdapter')
+                adapter = BluetoothAdapter.getDefaultAdapter()
+
+                if not adapter.isEnabled():
+                    adapter.enable()
+
+                if not os.path.isdir("service"):
+                    os.mkdir("service")
+                    open("service/me", "w").write(str(self.ME))
+
+                # Get the Android Context
+                Context = autoclass("android.content.Context")
+                PythonActivity = autoclass("org.kivy.android.PythonActivity")
+                activity = PythonActivity.mActivity
+
+                # Access Java classes
+                BLEAdvertiser = autoclass("org.kivy.emergency.BLEAdvertiser")
+                BLEService = autoclass("org.kivy.emergency.BLEService")
+
+                # Initialize BLEAdvertiser
+                ble_advertiser = BLEAdvertiser(activity)
+
+                # Start advertising
+                service_uuid = "0000180f-0000-1000-8000-00805f9b34fb"  # Replace with your actual UUID
+                data_key = "exampleKey"
+                data_value = "exampleValue"
+                # Combine service_uuid, data_key, and data_value into one string
+                dictionary_entry = f"{service_uuid}:{data_key}:{data_value}"
+                ble_advertiser.startAdvertising(dictionary_entry)
+                # ble_advertiser.startAdvertising(service_uuid, data_key, data_value)
+
+                # Initialize BLEService
+                ble_service = BLEService(activity)
+
+                # Start scanning
+                ble_service.startScanning()
+
+
+                Clock.schedule_interval(received, 2)
+            except Exception as ex:
+                Logger.info(f"BLUERROR: {ex} \n {traceback.format_exc()}")
+
+        elif platform == "ios":
+            print("ios")
+            pass
+
+        elif platform == "win":
+            print("win")
+            pass
+            # import bluetooth
+            #
+            # def bluetooth_server():
+            #     server_socket = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
+            #     server_socket.bind(("", bluetooth.PORT_ANY))
+            #     server_socket.listen(1)
+            #
+            #     print("Waiting for connection...")
+            #     client_socket, address = server_socket.accept()
+            #     print(f"Connected to {address}")
+            #
+            #     with open("received_file.txt", "wb") as file:
+            #         while True:
+            #             data = client_socket.recv(1024)
+            #             if not data:
+            #                 break
+            #             file.write(data)
+            #
+            #     print("File received successfully.")
+            #     client_socket.close()
+            #     server_socket.close()
+            # try:
+            #     bluetooth_server()
+            # except:
+            #     pass
+
+        elif "mac" in platform:
+            print("ios")
+            pass
+
+    def Bluetooth_expose(self,x):
+        from jnius import autoclass
+        BluetoothAdapter = autoclass('android.bluetooth.BluetoothAdapter')
+        adapter = BluetoothAdapter.getDefaultAdapter()
+
+        if not adapter.isEnabled():
+            adapter.enable()
+
+        try:
+            import json
+            import os
+            from jnius import autoclass
+            from kivy.clock import Clock
+            from kivy.logger import Logger
+
+            # Load the BLEService class
+            BLEService = autoclass('org.kivy.emergency.BLEService')
+            PythonActivity = autoclass('org.kivy.android.PythonActivity')
+
+            # Initialize BLEService
+            context = PythonActivity.mActivity
+            ble_service = BLEService(context)
+
+            # Function to start scanning for BLE devices
+            def start_scanning():
+                ble_service.startScanning()
+
+            # Function to read discovered devices from their respective files
+            def read_discovered_devices(dt):
+                discovered_devices_dir = os.path.join(context.getFilesDir().getPath(),
+                                                      "Discovered_devices")  # "Received_data"
+                # here=os.path.dirname(__file__)
+                # DIR=os.path.abspath(os.path.join(here,dt))
+                # ici=os.listdir(DIR)
+                # parent_dir+="../"
+                if os.path.isdir(context.getFilesDir().getPath()):
+                    ici = os.listdir(context.getFilesDir().getPath())
+                else:
+                    ici = os.listdir("/")
+
+                devices = []
+
+                if os.path.exists(discovered_devices_dir):
+                    # Logger.info(f"FOLDER EXISTS")
+                    for date_dir in os.listdir(discovered_devices_dir):
+                        # Logger.info(f"DATE_DIR:{date_dir}")
+                        date_path = os.path.join(discovered_devices_dir, date_dir)
+                        if os.path.isdir(date_path):
+                            # Logger.info(f"DATE_DIR EXISTS:{date_dir}")
+                            for filename in os.listdir(date_path):
+                                # Logger.info(f"FILES:{filename}")
+                                if filename.endswith('.txt'):
+                                    devices.append(filename[:-4])  # Append address without .txt
+                                    send({"message":"Aime shabani"},filename[:-4])
+
+                Logger.info(f"Discovered devices: {devices},ici: {ici}")
+                return devices
+
+            # Function to send data to a device
+            def send(data, address):
+                try:
+                    data_json = json.dumps(data)  # Convert dictionary to JSON string
+                    ble_service.sendData(data_json, address)
+                    Logger.info(f"Sent data to {address}: {data_json}")
+                except Exception as e:
+                    Logger.error(f"Error sending data: {e}")
+
+            # Function to handle received data
+            def received(sender=None, date=None):
+                global parent_dir
+
+                discovered_devices_dir = os.path.join(context.getFilesDir().getPath(), "Received_data")
+                HERE=os.listdir(discovered_devices_dir)
+                Logger.info(f"HERE: {HERE}")
+
+                devices = {}
+
+                if os.path.exists(discovered_devices_dir):
+                    # Logger.info(f"FOLDER EXISTS")
+                    for date_dir in os.listdir(discovered_devices_dir):
+                        Logger.info(f"DATE_DIR:{date_dir}")
+                        # if date and date_dir == date:
+                        date_path = os.path.join(discovered_devices_dir, date_dir)
+                        if os.path.isdir(date_path):
+                            Logger.info(f"DATE_DIR EXISTS:{date_dir}")
+                            for filename in os.listdir(date_path):
+                                Logger.info(f"FILES:{filename}")
+                                devices[filename] = eval(open(filename, 'r').read())
+
+                Logger.info(f"Received data: {devices}")
+                # return devices
+
+            # Start scanning for devices
+            start_scanning()
+            parent_dir = "../"
+            Clock.schedule_interval(read_discovered_devices, 2)
+            Clock.schedule_interval(received, 2)
+
+
+        except Exception as ex:
+            Logger.info(f"BLUERROR: {ex}")
+    #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++    BLUETOOTH
 
     def SIDEBAR(self,clo):
         def disp(cl):
@@ -1916,14 +2350,42 @@ class RM(Screen):
             else:
                 SB.opacity = SB.opacity + 0.03
 
-        SB=Widget(opacity=0,pos=(0,0),size_hint=(.08,1))  #          pos_hint={"center_x":.01,"center_y":.7}
+        def FIRST():
+            Clock.schedule_once(lambda cc: CONTC())
+
+        def CONTC():
+            mov = ScrollView(size_hint=(1, .5), do_scroll_x=False, do_scroll_y=True, scroll_timeout=200,
+                             scroll_distance=40,
+                             scroll_type=['bars', 'content'], bar_width=1, bar_color=(1, 0, 0, 1), bar_margin=0
+                             , pos_hint={"center_x": .5, "center_y": .3})
+            Gmov = GridLayout(cols=1, size_hint=(1, None), spacing=5,
+                              size=(3, ((Window.width / 100) * 16) * len(contacts) + 450))
+
+            for z in contacts:
+                if z != self.ME["idd"]:
+                    cnct = MDIconButton(md_bg_color=(0, 0, 0, 0), icon_size=(Window.width / 100) * 8,
+                                        ids={"idd": z, "schm": dr() + "contacts/" + z}, on_release=self.PROFILE)
+                    if os.path.isfile(dr() + "contacts/" + z + "/" + z + ".png"):
+                        cnct.icon = dr() + "contacts/" + z + "/" + z + ".png"
+                    else:
+                        cnct.icon = "photos/user.png"
+                    Gmov.add_widget(cnct)
+
+            mov.add_widget(Gmov)
+            GR.add_widget(mov)
+
+        SB=Widget(opacity=0,pos=(4,0),size_hint=(.08,1))  #          pos_hint={"center_x":.01,"center_y":.7}
         GR=GridLayout(cols=1,size_hint=(None,1),pos_hint={"center_x":.0,"center_y":.0},spacing=10,size=((Window.width/100)*8,Window.size[1]))
         with GR.canvas.before:
             Color(randint(2,100)/100,randint(2,100)/100,randint(2,100)/100, randint(50,101)/100)
             RoundedRectangle(pos=SB.pos,radius=[10],size=((Window.width/100)*12,Window.size[1]))
 
         me =MDIconButton(md_bg_color=(0,0,0,0),icon_size=(Window.width/100)*8,
-                         ids={"idd":self.ME["idd"],"schm":dr()+"contacts/"+self.ME["idd"]},on_release=self.PROFILE)
+                         ids={"idd":self.ME["idd"],"schm":dr()+"contacts/"+self.ME["idd"]})
+        if self.ME["Name"][0]== "Emergency" :
+            me.bind(on_release=self.new)
+        else:
+            me.bind(on_release=lambda bn:self.PROFILE(iddd=bn,update_new=None,mine=4))
 
         if os.path.isfile(dr()+"contacts/"+self.ME["idd"]+"/"+self.ME["idd"]+".png"):
             if os.path.getsize(dr()+"contacts/"+self.ME["idd"]+"/"+self.ME["idd"]+".png") > 2000 :
@@ -1937,6 +2399,9 @@ class RM(Screen):
         remi = MDIconButton(md_bg_color=(0, 0, 0, 0), icon="photos/remi.png", icon_size=(Window.width / 100) * 8,
                           ids={"idd": self.ME["idd"], "schm": dr() + "contacts/" + self.ME["idd"]},
                           on_release=self.home)
+        msg = {"schm": ".", "sidd": str(uuid.uuid4()).replace("-", "").replace(" ", "").replace("_", "")[:5],
+               "action": "5555", "idd": self.ME["idd"]}
+        remi.bind(on_release=lambda w: send(msg))
 
         GR.add_widget(me)
         GR.add_widget(work)
@@ -1949,24 +2414,7 @@ class RM(Screen):
         GR.add_widget(con)
 
         print("THE CONTACTS BELOW SHOULD BE IN      SCROLLVIEW       IN NEXT UPDATE.")
-        mov=ScrollView(size_hint=(1,.5), do_scroll_x=False, do_scroll_y=True, scroll_timeout=200, scroll_distance=40,
-                          scroll_type=['bars', 'content'], bar_width=1, bar_color=(1, 0, 0, 1), bar_margin=0
-                              ,pos_hint={"center_x": .5, "center_y": .3})
-        Gmov=GridLayout(cols=1,size_hint=(1,None),spacing=5,size=(3, ((Window.width / 100) * 16) *len(contacts) +450  ))
-
-        for z in contacts:
-            print("contact ",z)
-            if z != self.ME["idd"]:
-                cnct=MDIconButton(md_bg_color=(0,0,0,0),icon_size=(Window.width/100)*8,
-                                  ids={"idd":z,"schm":dr()+"contacts/"+z},on_release=self.PROFILE)
-                if os.path.isfile(dr()+"contacts/"+z+"/"+z+".png"):
-                    cnct.icon=dr()+"contacts/"+z+"/"+z+".png"
-                else:
-                    cnct.icon="photos/user.png"
-                Gmov.add_widget(cnct)
-
-        mov.add_widget(Gmov)
-        GR.add_widget(mov)
+        Clock.schedule_once(lambda cc: threading.Thread(target=FIRST).start(), 2)
         SB.add_widget(GR)
         self.add_widget(SB)
 
@@ -2178,11 +2626,16 @@ class RM(Screen):
             y = randint(0, Window.size[1] // 1.5)
             self.CLOCK=Clock.schedule_interval(lambda Clo: self.UPP(x, y), 1 / 1000)
 
-        if not os.path.exists(self.ME["adress"][1]+"/"+OF_ND):
+        if not os.path.exists(self.ME["adress"][1]+"/"+OF_ND):    #   "LOOKING FOR"    "OFFERING"
             os.makedirs(self.ME["adress"][1]+"/"+OF_ND)
             os.makedirs(self.ME["adress"][1] + "/" + OF_ND+"/jobs")
             os.makedirs(self.ME["adress"][1] + "/" + OF_ND + "/bagainers")
             os.makedirs(self.ME["adress"][1] + "/" + OF_ND + "/given")
+
+            os.makedirs(self.ME["adress"][1] + "/OFFERING")
+            os.makedirs(self.ME["adress"][1] + "/OFFERING/jobs")
+            os.makedirs(self.ME["adress"][1] + "/OFFERING/bagainers")
+            os.makedirs(self.ME["adress"][1] + "/OFFERING/given")
         try:
             self.remove_widget(self.OFF_NED.parent)
             # self.OFF_NED.clear_widgets()
@@ -2388,7 +2841,6 @@ class RM(Screen):
         del sen
 
     def WORK(self, bt, msg="Select jobs you can do up to 5. : \n ",found=None,zn=None):
-        # print(bt,">>",msg,">>",found,">>",zn)
         def ZN(button):
             if not button.text in zn.ids["zn"]:
                 if len(zn.ids["zn"]) == 1:
@@ -2411,6 +2863,33 @@ class RM(Screen):
                 except:
                     pass
 
+            lab.text=str(len(zn.ids["zn"]))+"/"+limit
+        def SELECTION(button):
+            if not zn:
+                limit = "5"
+            else:
+                limit = "1"
+
+            if not button.text.replace("\n", "") in self.professios:
+                if len(self.professios) == 5:
+                    try:
+                        vibrator.vibrate(1 / 50)
+                    except:
+                        pass
+                    return
+                button.md_bg_color = (.7, 1, .7, 1)
+                self.professios.append(button.text.replace("\n", ""))
+            else:
+                try:
+                    button.md_bg_color = (1, .7, 0, .8)
+                    self.professios.remove(button.text.replace("\n", ""))
+                except:
+                    pass
+            print(self.professios)
+            try:
+                lab.text = str(len(self.professios)) + "/" + limit
+            except:
+                pass
         def Find(wd, ZN):
             tx=wd.text
             goten=[]
@@ -2420,6 +2899,38 @@ class RM(Screen):
                         goten.append(e)
 
             Clock.schedule_once(lambda dt:self.WORK(bt=None,msg=msg,found=goten,zn=ZN))
+        def YIELD():
+            nonlocal gen
+            try:
+                return next(gen)
+            except:
+                return None
+        def GEN():
+            self.JBS.scroll_y = 0.001
+            self.JBS.scroll_y = 0.001
+            self.JBS.scroll_y = 0.001
+            with open("JBS.txt", "r") as JBS:
+                for i in JBS:
+                    yield i
+        def FIRST():
+            Clock.schedule_once(lambda cc: CONTC())
+        def CONTC(klock=None):
+            text=YIELD()
+            if text:
+                lab2.text=str(int(lab2.text)+1)  #+"/374"
+                button = CustomTB(text=text, md_bg_color=(.7, 1, .7, 1) if text[:-1] in self.professios else ( 1, .7, 0, .8))
+                if zn:
+                    button.bind(on_release=ZN)
+                else:
+                    button.bind(on_release=SELECTION)
+                self.JBL.add_widget(button)                                                  #  self.JBL.children[0].text
+                self.JBL.size = (self.JBL.size[0], self.JBL.size[1] + Window.size[1] / 10)
+                Clock.schedule_once(CONTC)
+            else:
+                try:
+                    vibrator.vibrate(1/40)
+                except:
+                    pass
 
         if found == []:
             return
@@ -2430,7 +2941,7 @@ class RM(Screen):
                 if zn:
                     button.bind(on_release=ZN)
                 else:
-                    button.bind(on_release=self.SELECTION)
+                    button.bind(on_release=SELECTION)
                 self.JBL.size = (self.JBL.size[0], self.JBL.size[1] + Window.size[1] / 20)
                 self.JBL.add_widget(button,index=len(self.JBL.children))
                 self.JBS.scroll_y=1.
@@ -2438,14 +2949,16 @@ class RM(Screen):
 
         if not zn:
             self.professios = self.ME.get("jb", [])
+            limit="5"
         else:
             self.professios=[]                               # dd=pickle.load(open("JOBS.bin","rb"))
+            limit="1"
 
         old = self.ME.get("jb", [])
         self.REL = RelativeLayout(size_hint=(None, None),size=((Window.size[0] / 100) * 81, (Window.size[1] / 100) * 85),
                                   pos_hint={"center_x": .5, "center_y": .5})
         with self.REL.canvas.before:
-            Color(.65, 0, .2, .8)  # (.65,0,.2,.8)  (1,.7,0,.8)
+            Color(randint(0, 100) / 100, randint(0, 100) / 100, randint(0, 100) / 100, .8)  # (.65,0,.2,.8)  (1,.7,0,.8)
             rect = RoundedRectangle(pos=(-10, -5), radius=[10],size=((Window.size[0] / 100) * 81, (Window.size[1] / 100) * 85))
 
         self.JBS = ScrollView(size_hint=(.84, .85), do_scroll_x=False, do_scroll_y=True, scroll_timeout=55, scroll_distance=20,
@@ -2459,15 +2972,8 @@ class RM(Screen):
         find.bind(on_text_validate=lambda wd:threading.Thread(target=Find,args=(wd,zn,)).start())
         self.REL.add_widget(find)
 
-        with open("JBS.txt", "r") as JBS:
-            for i in JBS:
-                button = CustomTB(text=i,md_bg_color=(.7, 1, .7, 1) if i in self.professios else (1, .7, 0, .8))  # ToggleButton
-                if zn:
-                    button.bind(on_release=ZN)
-                else:
-                    button.bind(on_release=self.SELECTION)
-                self.JBL.add_widget(button)
-                self.JBL.size = (self.JBL.size[0], self.JBL.size[1] + Window.size[1] / 20)
+        gen = GEN()
+        Clock.schedule_once(lambda cc: threading.Thread(target=FIRST).start(), 2)
 
         self.JBS.add_widget(self.JBL)
         self.REL.add_widget(self.JBS)
@@ -2479,6 +2985,11 @@ class RM(Screen):
         okbt.bind(on_release=lambda bt: send({"schm": ".", "sidd": str(uuid.uuid4()).replace("-", "").replace(" ", "").replace("_", "")[:5],
              "action": "JB", "idd": self.ME["idd"], "jb": self.professios, "zn": self.ME["adress"], "old": old}))
         okbt.bind(on_release=self.MME)
+        okbt.bind(on_release=lambda clic:self.remove_widget(self.REL.parent))
+        lab=Label( text=str(len(self.professios))+"/"+limit,pos_hint={"center_x": .85, "center_y": .91})
+        self.REL.add_widget(lab)
+        lab2 = Label(text="0", color=(1,1,1,.5),pos_hint={"center_x": .85, "center_y": .1})
+        self.REL.add_widget(lab2)
 
         if not zn :
             self.REL.add_widget(okbt)
@@ -2493,25 +3004,6 @@ class RM(Screen):
         # del button
         # del rect
         # self.add_widget(r)
-
-    def SELECTION(self, button):
-
-        if not button.text.replace("\n","") in self.professios :
-            if len(self.professios) == 5:
-                try:
-                    vibrator.vibrate(1/50)
-                except:
-                    pass
-                return
-            button.md_bg_color = (.7, 1, .7, 1)
-            self.professios.append(button.text.replace("\n",""))
-        else:
-            try:
-                button.md_bg_color=(1,.7,0,.8)
-                self.professios.remove(button.text.replace("\n",""))
-            except:
-                pass
-        print(self.professios)
 
     def RECEIVER(self,xmessage):
         XM=[]
@@ -3003,7 +3495,7 @@ class RM(Screen):
                 return pth
             else:
                 IM=ImageProcessor()
-                RP=IM.cut(IN=pth,OUT="SD/contacts/"+self.ME["idd"]+"/"+self.ME["idd"]+".png")
+                RP=IM.cut(IN=pth,OUT=dr()+"contacts/"+self.ME["idd"]+"/"+self.ME["idd"]+".png")
                 im.source =RP
                 im.reload()
                 self.Loader(up=RP)
@@ -3030,7 +3522,9 @@ class RM(Screen):
                 Color(R,G,B,O)
                 rect = RoundedRectangle(pos=(0, 0), radius=[10], size=(pg.size[0]+pg.size[0]/5,pg.size[1]))
 
-            ll = [FileChooserListView(path=dr()), FileChooserIconView(path=dr())]
+            ll = [    FileChooserListView(path=os.path.dirname(os.path.dirname(os.path.dirname(dr())))),
+                       FileChooserIconView(  path=os.path.dirname(os.path.dirname(os.path.dirname(dr()))))    ]
+
             ch = ll[randint(1, 2) - 1]
             ch.dirselect = False
             ch.bind(selection=on_selected)
@@ -3131,6 +3625,7 @@ class RM(Screen):
 
     def CARO3(self,DI,schm=None,sx=Window.size[0] / 8,sy=Window.size[1] / 15,ORIGINE=None):
         def photo(x):
+            nonlocal pht
             if platform == "android" :
                 pth.append(self.load_image())
             else:
@@ -3278,7 +3773,7 @@ class RM(Screen):
 
         return scroll_view  #main_layout
 
-    def PROFILE(self, iddd, update_new=None):
+    def PROFILE(self, iddd, update_new=None,mine=None):
         """BIO ON LEFT
         PUBLIC COMMENTS RIGHT              2 message will be downloaded when the scroll reaches the end
         BUSINESS OR TALENT PHOTOS BOTTOM
@@ -3303,7 +3798,9 @@ class RM(Screen):
         schm = iddd.ids["schm"]
         schm2 = iddd.ids["schm"] + "/chats/"
         if not os.path.isfile(schm + "/" + idd + ".json"):
-            print(schm + "/" + idd + ".json")
+            print()
+            if mine:
+                self.new(x=None,idd=None)
             return
         DIC = json.load(open(schm + "/" + idd + ".json", "r"))
         FILES = self._files(schm2)
@@ -3318,7 +3815,7 @@ class RM(Screen):
             Color( randint(0, 100) / 100, randint(0, 70) / 100, randint(0, 30) / 100, 1)
             RCT = RoundedRectangle(pos=(0,0), radius=[20], size=(RL.size[0], RL.size[1] / 2.4))
 
-        prof = RelativeLayout(size_hint=(None, None), size=(Window.size[0] / 4, Window.size[0] / 4), ids={"x": 0},
+        prof = RelativeLayout(opacity=.3,size_hint=(None, None), size=(Window.size[0] / 4, Window.size[0] / 4), ids={"x": 0},
                               pos=(0, RL.size[1] - Window.size[0] / 4))
         Im = AsyncImage(source=self.profile(DIC.get("idd","")))  # self.profile checkes in contacts/idd/idd.png  if not idd.png, return link and download it.
         prof.add_widget(Im)
@@ -3326,7 +3823,15 @@ class RM(Screen):
             open_prfl = MDRaisedButton(md_bg_color=(1, 1, 1, 0), ids={"idd": DIC.get("idd", "")}, rounded_button=10,
                                        size_hint=(.98, .98), pos_hint={'center_x': .5, 'center_y': .5},
                                        on_release=lambda x: self.preload_image(Im))
+
+            Edit = MDIconButton(icon="photos/user.png", icon_size=RL.size[0] / 16, md_bg_color=(0, 0, 0, .3),
+                                rounded_button=30, size_hint=(None, None),
+                                size=(RL.size[0] / 4, RL.size[0] / 4),
+                                pos_hint={'center_x': .15, 'center_y': .1},
+                                on_press=lambda bt: self.new(x=bt,idd=DIC["idd"]))
+
             prof.add_widget(open_prfl)
+            prof.add_widget(Edit)
             open_prfl.elevation = 0
         RL.add_widget(prof)
 
@@ -3408,6 +3913,88 @@ class RM(Screen):
             pass
             # threading.Thread(target=self.RLD,args=(Im,)).start()
 
+    def _talk(self,idd=None,sidd=None,stop=None):
+        if stop :
+            try:
+                self.mRecorder2.stop()
+                self.mRecorder2.release()
+            except:
+                pass
+            try:
+                self.mRecorder.stop()
+                self.mRecorder.release()
+            except:
+                pass
+            Clock.unschedule( self.clockstop)
+            self.rn=0
+            vibrator.vibrate(1)
+            return
+        if platform == 'android':
+            self.rn += 1
+            # try:
+            if not os.path.isdir(dr()+"talking/"):
+                os.mkdir(dr()+"talking/")
+            MediaRecorder = autoclass('android.media.MediaRecorder')
+            AudioSource = autoclass('android.media.MediaRecorder$AudioSource')
+            OutputFormat = autoclass('android.media.MediaRecorder$OutputFormat')
+            AudioEncoder = autoclass('android.media.MediaRecorder$AudioEncoder')
+            Environment = autoclass('android.os.Environment')
+
+            # storage_path = Environment.getExternalStorageDirectory().getAbsolutePath()
+            output_file = dr()+'talking/'+sidd+'.mp3'
+
+            self.mRecorder = MediaRecorder()
+            self.mRecorder.setAudioSource(AudioSource.MIC)
+            self.mRecorder.setOutputFormat(OutputFormat.MPEG_4)
+            self.mRecorder.setOutputFile(output_file)
+            self.mRecorder.setAudioEncoder(AudioEncoder.AMR_NB)
+            try:
+                self.mRecorder2.stop()
+                self.mRecorder2.release()
+            except:
+                pass
+            self.mRecorder.prepare()
+            self.mRecorder.start()
+            self.clockstop=Clock.schedule_once(lambda cl:self.next_talk(idd,sidd=str(self.rn)+"_"+str(uuid.uuid4())[:8]),4)
+
+        else:
+            pass
+
+    def next_talk(self,idd,sidd):
+        if platform == 'android':
+            self.rn+=1
+            if not os.path.isdir(dr()+"talking/"):
+                os.mkdir(dr()+"talking/")
+            MediaRecorder = autoclass('android.media.MediaRecorder')
+            AudioSource = autoclass('android.media.MediaRecorder$AudioSource')
+            OutputFormat = autoclass('android.media.MediaRecorder$OutputFormat')
+            AudioEncoder = autoclass('android.media.MediaRecorder$AudioEncoder')
+            Environment = autoclass('android.os.Environment')
+
+            # storage_path = Environment.getExternalStorageDirectory().getAbsolutePath()
+            output_file = dr()+'talking/'+sidd+'.mp3'
+
+            self.mRecorder2 = MediaRecorder()
+            self.mRecorder2.setAudioSource(AudioSource.MIC)
+            self.mRecorder2.setOutputFormat(OutputFormat.MPEG_4)
+            self.mRecorder2.setOutputFile(output_file)
+            self.mRecorder2.setAudioEncoder(AudioEncoder.AMR_NB)
+            try:
+                self.mRecorder.stop()
+                self.mRecorder.release()
+            except:
+                pass
+
+            self.mRecorder2.prepare()
+            self.mRecorder2.start()
+
+            self.clockstop=Clock.schedule_once(lambda cl:self._talk(idd=idd,sidd=str(self.rn)+"_"+str(uuid.uuid4())[:8]),4)
+
+        else:
+            pass
+
+        print(idd,"talking...")
+
     def MSG(self,B,update_new=None):
         "Each item has its own messages. when deleted, messges goes too"
         "each profile has its private chats,each idd with its chats list and images path"
@@ -3446,7 +4033,6 @@ class RM(Screen):
                         "idd": self.ME["idd"], "recipients": [DIC["idd"]],"zone": self.ME["adress"],
                         "N": "-1"}
                 send(Dict)
-
         def _block(idd,btn):
             if not os.path.isdir('.bl'):
                 os.mkdir(".bl")
@@ -3475,8 +4061,6 @@ class RM(Screen):
                         "N": "1"}
                 send(Dict)
 
-        def _talk(t):
-            pass
         def Get(sch,Id,sv):
             # print(sv.scroll_y)
             # check.append(sv.scroll_y)
@@ -3510,7 +4094,6 @@ class RM(Screen):
             print("schm: ",B.ids["schm"])
             FILES = self._files(dr() + "Activities/" + schm.replace("Activities/","/"))
             DIC = pickle.load(open(dr() + "Activities" + "/" + B.ids["schm"].replace("Activities/","/").replace(".json","").replace(".bin","") + ".bin", "rb"))
-
 
         try:
             DIC["pht"].remove("")
@@ -3567,7 +4150,6 @@ class RM(Screen):
                 self.comg.size = (self.comg.size[0], self.comg.size[1] + Window.size[1] / 4)
             hist=cht
 
-
         coms.add_widget(self.comg)
         self.RL.add_widget(coms)
         coms.scroll_y=0
@@ -3592,9 +4174,9 @@ class RM(Screen):
 
 
         talk = MDIconButton(icon="photos/talk.png", icon_size=self.RL.size[0] / 15,md_bg_color=(0, 0, 1, .4), rounded_button=30, size_hint=(None, None),
-                             size=(self.RL.size[0] / 4, self.RL.size[0] / 4), pos_hint={'center_x': .39, 'center_y': .61})
+                             size=(self.RL.size[0] / 4, self.RL.size[0] / 4), pos_hint={'center_x': .39, 'center_y': .61},
+                            on_release=lambda bt: self._talk([DIC["idd"]],stop=2),on_press=lambda bt: self._talk([DIC["idd"]],sidd='0_'+str(uuid.uuid4())[:8]))
 
-        lk.bind(on_release=lambda btn:_like(DIC["idd"],lk))
         bl.bind(on_release=lambda btn: _block(DIC["idd"], bl))
 
         self.RL.add_widget(like)
@@ -4564,7 +5146,17 @@ class RM(Screen):
 
         def on_selected(ob, val):
             global choosen, result_ready,Im,List
-            if val[0].endswith((".png", ".PNG", ".jpg", ".JPG", "jpeg", "JPEG")):            #   , ".bmp", ".BMP", ".gif", ".GIF"
+            """
+            REMOVE THIS IF CONDITION TO SUPPORT ALL FILES.
+            
+            IN READER ON RECEIVER:
+            
+            TRY READ AS VIDEO
+            TRY READ AS PHOTO
+            TRY READ AS AUDIO
+            TRY READ AS PDF
+            """
+            if val[0].endswith(("pdf","PDF","png", "PNG", "jpg", "JPG", "jpeg", "JPEG","mp4","MP4","avi","AVI","mkv","MKV","3gp","3GP")):            #   , ".bmp", ".BMP", ".gif", ".GIF"
                 btn_ids.ids["pht"].append(val[0] )
                 print(btn_ids.ids)
 
@@ -4576,7 +5168,9 @@ class RM(Screen):
             Color(R,G,B,O)
             rect = RoundedRectangle(pos=(0, 0), radius=[10], size=(pg.size[0]+pg.size[0]/5,pg.size[1]))
 
-        ll = [FileChooserListView(path=dr()), FileChooserIconView(path=dr())]
+        ll = [FileChooserListView(path=os.path.dirname(os.path.dirname(os.path.dirname(dr())))),
+              FileChooserIconView(path=os.path.dirname(os.path.dirname(os.path.dirname(dr()))))]
+
         ch = ll[randint(1, 2) - 1]
         ch.dirselect = False
         ch.bind(selection=on_selected)
@@ -4948,4 +5542,5 @@ class Help(MDApp):
         return True
 
 if __name__ == '__main__':
+    print('1')
     Help().run()
